@@ -17,20 +17,24 @@ Ask questions, look up words, translate, and polish writing without opening anot
 - **Model dropdown:** discover and select the models your provider exposes.
 - **Ready-made commands:** Ask AI, Dictionary, Translator, and Polish Text.
 - **Your own commands:** create from templates; customize prompts, placeholders, models, and endpoint overrides.
-- **Comfortable reading:** follow the latest streamed line, select older rows to pause, or use **Ctrl+L** to pause/resume.
+- **Comfortable reading:** follow the latest streamed line, select older rows to pause, or use **Ctrl+L** (Windows) / **Command+L** (Mac) to pause/resume.
 - **Pocket AI Settings:** edit, add, delete, and restore built-in commands.
 - **Your shortcuts:** assign aliases and hotkeys; expose custom commands through Raycast Quicklinks.
 
 ## Requirements
 
-| Requirement   | Details                                                                                                                       |
-| ------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Windows       | A machine supported by Raycast for Windows; Windows is the tested installation platform.                                      |
-| Raycast       | Install, open, and sign in before installing Pocket AI. A free account is sufficient for this extension.                      |
-| Node.js + npm | Stable Node.js **22.22.2 or newer**, with `npm.cmd` installed next to `node.exe`.                                             |
-| AI provider   | An accessible OpenAI-compatible API with chat completions and model discovery. Provider access or subscriptions are separate. |
+| Requirement   | Details                                                                                                                            |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
+| Platform      | Windows is desktop-verified. macOS is declared and code-reviewed, but not desktop-verified; see the [Mac guide](INSTALL-MACOS.md). |
+| Raycast       | Install, open, and sign in before installing Pocket AI. A free account is sufficient for this extension.                           |
+| Node.js + npm | Stable Node.js **22.22.2 or newer** with npm; the Windows installer needs `npm.cmd` next to `node.exe`.                            |
+| AI provider   | An accessible OpenAI-compatible API with chat completions and model discovery. Provider access or subscriptions are separate.      |
 
 Pocket AI does not install Raycast, install a provider, purchase subscriptions, or supply API credentials.
+
+## Install on Mac
+
+Follow [INSTALL-MACOS.md](INSTALL-MACOS.md) for source import, production build, provider/agent setup, Mac shortcuts, updates, and verification. The plugin runtime has no Windows-only shell or filesystem dependency; macOS shortcuts are included. Actual Mac import, UI behavior, and live streaming remain unverified. Do not run the Windows PowerShell installer on a Mac.
 
 ## Install on Windows
 
@@ -117,7 +121,7 @@ Run **Configure AI Provider**, or select **AI Provider** in **Pocket AI Settings
 
 Models are discovered from `<base>/models`. The optional local bridge route `/api/openai/v1` uses `/api/v1/lm/chatModels` for discovery.
 
-The default endpoint is `http://127.0.0.1:23333/api/openai/v1`. It expects a separately running local VS Code Copilot bridge. **On another PC, `127.0.0.1` refers to that other PC.** Set up and sign into your bridge there, or change the endpoint.
+The default endpoint is `http://127.0.0.1:23333/api/openai/v1`. It expects a separately running local VS Code Copilot bridge. **On another computer, including a Mac, `127.0.0.1` refers to that computer.** Set up and sign into your bridge there, or change the endpoint.
 
 No bridge implementation, GitHub Copilot credentials, or provider access is bundled with Pocket AI. Different-origin command endpoint overrides never receive the default provider's API key.
 
@@ -129,7 +133,7 @@ See [REMOTE-AGENTS.md](REMOTE-AGENTS.md) for SSH/private ingress, server setup, 
 
 ## Commands and shortcuts
 
-Aliases and hotkeys are suggestions, not installed or overwritten automatically:
+Aliases and Windows hotkeys below are suggestions, not installed or overwritten automatically. See the [Mac shortcut table](INSTALL-MACOS.md#5-mac-shortcuts-and-customization) for Command/Option equivalents:
 
 | Command        | Suggested alias | Suggested hotkey |
 | -------------- | --------------- | ---------------- |
@@ -140,7 +144,7 @@ Aliases and hotkeys are suggestions, not installed or overwritten automatically:
 
 Assign them in **Raycast Settings > Extensions > Pocket AI**. For example, enter `df`, press Space, type a word, and press Enter.
 
-The top input clears after sending and becomes the follow-up input. **Ctrl+E** edits the current tool; **Ctrl+Shift+,** opens Pocket AI Settings. Translator has no default target language: choose one in that command.
+The top input clears after sending and becomes the follow-up input. **Ctrl+E** edits the current tool; **Ctrl+Shift+,** opens Pocket AI Settings on Windows. The direct-model Mac mappings are **Command+E** and **Command+Shift+,**. Translator has no default target language: choose one in that command.
 
 Custom commands can be added to Raycast using **Add Command to Raycast**, then given their own Quicklink alias/hotkey.
 
@@ -155,7 +159,7 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 - Deleting a built-in disables it in Pocket AI; restore it with its previous settings from the dashboard.
 - Raycast owns static command rows and Quicklinks. Disable/remove their shortcut entries separately if you no longer want them listed.
 - Custom placeholders apply inside an open command. Root-search argument hints come from the static manifest.
-- The SDK does not expose mouse-wheel scroll events. Select an older response row to pause following, or press Ctrl+L before wheel-only browsing.
+- The SDK does not expose mouse-wheel scroll events. Select an older response row to pause following, or press Ctrl+L (Windows) / Command+L (Mac) before wheel-only browsing.
 - Direct-model conversations live in invocation memory. Remote-agent transcripts live on your harness; Pocket AI remembers scoped session/run identifiers and encrypted OpenClaw device material, not a local conversation archive. Your provider/harness data-handling terms still apply.
 - Installation packages do not contain your custom commands, saved preferences, aliases, hotkeys, keys, or chat history.
 - The internal extension ID remains `mae-ai` for compatibility with existing shortcuts and storage; the user-facing name is Pocket AI.
@@ -174,6 +178,8 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 | Import timeout                           | Read logs in `.pocket-ai-install`; correct the cause and retry.                                                       |
 
 ## Development
+
+Windows commands are below. On macOS, use `npm` instead of `npm.cmd` for typecheck, lint, formatting, tests, and build; skip PowerShell installer/package commands. The Node test command uses portable relative paths.
 
 ```powershell
 npm.cmd ci

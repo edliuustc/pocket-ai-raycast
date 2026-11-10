@@ -29,6 +29,7 @@ The user-facing product name is **Pocket AI**. The manifest name `mae-ai`, exist
 - Do not claim that extension code can add arbitrary controls to Raycast's native preferences.
 - Do not maintain a local chat archive, synchronize user settings between machines, or automatically manage host-owned aliases and Quicklinks. Remote harnesses own their transcripts; Pocket AI persists scoped session/run identifiers and encrypted OpenClaw device material.
 - Windows is the verified installation platform. Although the manifest declares macOS compatibility, the Windows installer and desktop verification do not establish macOS support.
+- The macOS source workflow is documented in [INSTALL-MACOS.md](INSTALL-MACOS.md). Runtime review found no Windows-only shell or filesystem dependency; custom shortcuts map to Command on Mac. This is code portability evidence, not a Mac desktop test.
 
 ## 2. Commands and entry points
 
@@ -321,9 +322,11 @@ The import wait defaults to 120 seconds and can be set from 15 to 600 seconds. T
 
 The tested Raycast Windows 2.11.0.0 public build restricts direct `.rayext` import to internal builds, so Windows users install source rather than double-click a bundle. Keep source in a permanent folder. Installation preserves existing Raycast preferences and tool storage.
 
-The packager uses an allowlist and produces a source ZIP plus `SHA256SUMS`. The optional Windows CI file remains a template, not an enabled workflow. Build/package success alone does not establish desktop import, provider sign-in, model availability, or live streaming.
+The packager uses an allowlist, includes the Mac installation guide, and produces a source ZIP plus `SHA256SUMS`. On macOS, use the official Raycast source-development/import workflow, stop the development watcher after import, then run `npm run build` and verify persistence in Raycast. Node checks use portable test-file paths; PowerShell installer/package checks remain Windows-only.
 
-Source: [`install.ps1`](install.ps1), [`scripts/install-functions.ps1`](scripts/install-functions.ps1), [`scripts/package.ps1`](scripts/package.ps1). Installation procedures are in [README.md](README.md) and [AGENTS.md](AGENTS.md).
+The optional Windows CI file remains a template, not an enabled workflow. Build/package success alone does not establish desktop import, provider sign-in, model availability, or live streaming.
+
+Source: [`install.ps1`](install.ps1), [`scripts/install-functions.ps1`](scripts/install-functions.ps1), [`scripts/package.ps1`](scripts/package.ps1). Installation procedures are in [README.md](README.md), [INSTALL-MACOS.md](INSTALL-MACOS.md), and [AGENTS.md](AGENTS.md).
 
 ## 9. Acceptance criteria and verification baseline
 

@@ -6,6 +6,7 @@
 - User-facing product: Pocket AI.
 - Compatibility ID / npm name: `mae-ai`. Do not rename it or the existing command IDs.
 - Tested installation platform: Windows. Do not claim macOS installation is verified.
+- macOS runtime portability is code-reviewed; use [INSTALL-MACOS.md](INSTALL-MACOS.md) for the Mac source workflow and desktop verification boundary.
 - License: MIT. Preserve `LICENSE`.
 
 ## Design reference
@@ -13,6 +14,8 @@
 Read [DESIGN.md](DESIGN.md) for the current product and technical specification before changing behavior. Keep its interaction flows, compatibility constraints, and limitations aligned with implementation; distinguish implemented behavior from unverified or proposed capabilities.
 
 ## Install for a user
+
+Choose the procedure for the actual host. The steps below are **Windows-only**. On a Mac, follow [INSTALL-MACOS.md](INSTALL-MACOS.md): use Node/npm, `npm ci`, official Raycast source import/development, stop the watcher you started, and `npm run build`. Verify persistence, discovery, streaming, follow-ups, and Mac shortcuts on that Mac. Do not run PowerShell installers or claim success without GUI/provider evidence.
 
 1. Check that the user is on Windows, has Raycast installed, and has opened and signed into it.
 2. Check for stable Node.js >=22.22.2 and npm. Do not change global Node installations, execution policy, or registry settings without the user's request. Pass `-NodePath` for an existing alternate runtime.
@@ -75,6 +78,8 @@ powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1 -BuildOnly
 
 PowerShell installer tests do not require Pester. No API credentials, provider service, Raycast installation, or browser account is needed for unit tests or build-only checks.
 
+On macOS, the corresponding Node checks use `npm` rather than `npm.cmd`. `npm test` uses portable paths. PowerShell installer and Windows packaging commands are not Mac validation.
+
 ## Code map and invariants
 
 - `src\components\tool-command.tsx`: top-bar input, streamed response rows, follow-up conversations, model dropdown, pause/resume following.
@@ -107,6 +112,6 @@ Do not claim arbitrary command-management UI can be embedded in Raycast's native
 
 Run `npm.cmd run package:windows`. Publish `dist\pocket-ai-windows-source.zip` and `dist\SHA256SUMS` as release assets.
 
-The packager uses an allowlist; do not add `node_modules`, `.git`, `.pocket-ai-install`, `.env`, personal state, API keys, or user conversations. Keep API keys only in Raycast's password preference.
+The packager uses an allowlist and includes `INSTALL-MACOS.md`; do not add `node_modules`, `.git`, `.pocket-ai-install`, `.env`, personal state, API keys, or user conversations. Keep API keys only in Raycast's password preference.
 
 An optional workflow template is in `.github\workflow-templates\validate.yml`. Activating it under `.github\workflows` requires the publisher's GitHub `workflow` permission. Do not silently assume CI has run or change authorization without the user.

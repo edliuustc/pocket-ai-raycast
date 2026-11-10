@@ -1,5 +1,11 @@
 Pocket AI - your AI tools in Raycast
 
+MAC INSTALLATION
+See INSTALL-MACOS.md for source import, provider setup, Mac shortcuts,
+updates, and required desktop checks. macOS is declared and code-reviewed,
+but has not been desktop-verified. Do not run install.ps1 on a Mac.
+The Ctrl shortcuts below describe Windows; use the Mac guide for equivalents.
+
 QUICK START
 Type an alias, press Space, enter your text, then press Enter:
   ask  Ask anything

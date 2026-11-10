@@ -6,7 +6,7 @@ Raycast is the frontend; the remote harness owns model selection, tools, web acc
 
 ## Setup in Raycast
 
-1. Install/update Pocket AI using [the Windows installer](README.md#install-on-windows).
+1. Install/update Pocket AI using [the Windows installer](README.md#install-on-windows) or the [Mac source guide](INSTALL-MACOS.md).
 2. Open **Pocket AI Settings > Remote Agents**.
 3. Choose **Hermes Agent** or **OpenClaw Agent** in **Ask AI Backend**.
 4. Enter that backend's server URL. Only the selected backend's fields appear; switching keeps each URL draft.

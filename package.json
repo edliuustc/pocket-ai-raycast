@@ -204,7 +204,7 @@
     "dev": "ray develop",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests\\stream.test.ts tests\\tools.test.ts tests\\models.test.ts tests\\response-rows.test.ts tests\\session.test.ts tests\\scroll-policy.test.ts tests\\agents.test.ts tests\\agent-settings.test.ts",
+    "test": "node --import tsx --test tests/stream.test.ts tests/tools.test.ts tests/models.test.ts tests/response-rows.test.ts tests/session.test.ts tests/scroll-policy.test.ts tests/agents.test.ts tests/agent-settings.test.ts",
     "test:installer": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests\\installer.tests.ps1",
     "package:windows": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\\package.ps1",
     "format": "prettier --write .",
