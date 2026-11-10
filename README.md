@@ -204,7 +204,7 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 
 ## Community
 
-[Share a workflow or ask a question in Discussions](https://github.com/edliuustc/pocket-ai-raycast/discussions). Use [Issues](https://github.com/edliuustc/pocket-ai-raycast/issues) for reproducible bugs and feature requests. Pocket AI is independent of Raycast, GitHub Copilot, Hermes, and OpenClaw.
+[Read the launch announcement or share a workflow](https://github.com/edliuustc/pocket-ai-raycast/discussions/1). Use [Issues](https://github.com/edliuustc/pocket-ai-raycast/issues) for reproducible bugs and feature requests. See the [sharing kit and remaining publishing steps](https://github.com/edliuustc/pocket-ai-raycast/blob/main/PROMOTION.md), including the [draft Store submission](https://github.com/raycast/extensions/pull/33370). Pocket AI is independent of Raycast, GitHub Copilot, Hermes, and OpenClaw.
 
 ## Development
 
