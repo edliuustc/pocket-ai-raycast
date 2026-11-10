@@ -1,6 +1,6 @@
 {
   "name": "mae-ai",
-  "version": "1.2.0",
+  "version": "1.2.1",
   "private": true,
   "title": "Pocket AI",
   "description": "AI answers, definitions, translations, and writing help right in Raycast's search bar, powered by your own provider.",
@@ -88,6 +88,13 @@
       ]
     },
     {
+      "name": "remote-agents",
+      "title": "Remote Agents",
+      "subtitle": "Pocket AI",
+      "description": "Choose the Ask AI backend and server URL in the shared settings screen.",
+      "mode": "view"
+    },
+    {
       "name": "configure-provider",
       "title": "Configure AI Provider",
       "subtitle": "Pocket AI",
@@ -165,55 +172,17 @@
       "required": false
     },
     {
-      "name": "askBackend",
-      "type": "dropdown",
-      "title": "Ask AI Backend",
-      "description": "Advanced legacy fallback. Use Pocket AI Settings > Remote Agents for backend-specific settings that switch dynamically. Dictionary, Translator, Polish, and custom tools keep using the direct provider.",
-      "required": false,
-      "default": "direct",
-      "data": [
-        {
-          "title": "Direct Model",
-          "value": "direct"
-        },
-        {
-          "title": "Hermes Agent",
-          "value": "hermes"
-        },
-        {
-          "title": "OpenClaw Agent",
-          "value": "openclaw"
-        }
-      ]
-    },
-    {
-      "name": "hermesUrl",
-      "type": "textfield",
-      "title": "Hermes Server URL",
-      "description": "Advanced legacy fallback. Set this URL in Pocket AI Settings > Remote Agents, which shows only the chosen backend. Include /p/profile if used.",
-      "required": false,
-      "default": "http://127.0.0.1:8642"
-    },
-    {
       "name": "hermesKey",
       "type": "password",
       "title": "Hermes API Key",
-      "description": "Your Hermes API_SERVER_KEY. This never inherits the direct-model API key.",
+      "description": "Your Hermes API_SERVER_KEY. Choose the backend and URL in Pocket AI's Remote Agents command. This never inherits the direct-model API key.",
       "required": false
-    },
-    {
-      "name": "openclawUrl",
-      "type": "textfield",
-      "title": "OpenClaw Gateway URL",
-      "description": "Advanced legacy fallback. Set this URL in Pocket AI Settings > Remote Agents. Use a loopback SSH tunnel or trusted wss:// endpoint.",
-      "required": false,
-      "default": "ws://127.0.0.1:18789"
     },
     {
       "name": "openclawToken",
       "type": "password",
       "title": "OpenClaw Gateway Token / Password",
-      "description": "Your gateway shared token or password. Also protects this endpoint's persistent device identity; changing it requires pairing a new identity.",
+      "description": "Your gateway shared token or password. Choose the backend and URL in Pocket AI's Remote Agents command. Changing this credential requires pairing a new device identity.",
       "required": false
     }
   ],

@@ -2,6 +2,7 @@ import {
   Action,
   ActionPanel,
   Icon,
+  getPreferenceValues,
   Keyboard,
   launchCommand,
   LaunchType,
@@ -16,6 +17,9 @@ import { loadDeletedTools, loadTools, restoreTool } from "../lib/storage";
 import { builtInTools, Tool, toolDeeplink } from "../lib/tools";
 import ToolEditor, { confirmDeleteCommand } from "./tool-editor";
 import AgentSettingsView from "./agent-settings";
+import { effectiveAgentSettings, AskBackend } from "../lib/agent-settings";
+import { loadAgentSettings } from "../lib/agent-settings-storage";
+import { Preferences } from "../lib/preferences";
 
 export default function SettingsView({
   onChange,
@@ -26,14 +30,20 @@ export default function SettingsView({
   const [tools, setTools] = useState<Tool[]>([]);
   const [deleted, setDeleted] = useState<Tool[]>([]);
   const [loading, setLoading] = useState(true);
+  const [backend, setBackend] = useState<AskBackend>("direct");
   const refresh = useCallback(async () => {
     try {
-      const [active, removed] = await Promise.all([
+      const [active, removed, saved] = await Promise.all([
         loadTools(),
         loadDeletedTools(),
+        loadAgentSettings(),
       ]);
       setTools(active);
       setDeleted(removed);
+      setBackend(
+        effectiveAgentSettings(getPreferenceValues<Preferences>(), saved)
+          .backend,
+      );
     } catch (failure) {
       await showToast({
         style: Toast.Style.Failure,
@@ -88,7 +98,7 @@ export default function SettingsView({
         <List.Item
           id="remote-agent-settings"
           title="Remote Agents"
-          subtitle="Ask AI backend, Hermes, and OpenClaw"
+          subtitle={`Ask AI: ${backend === "hermes" ? "Hermes Agent" : backend === "openclaw" ? "OpenClaw Agent" : "Direct Model"}`}
           icon={Icon.Network}
           keywords={[
             "agent",

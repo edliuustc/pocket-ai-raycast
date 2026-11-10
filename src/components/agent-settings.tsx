@@ -66,21 +66,21 @@ export default function AgentSettingsView({
     if (loading || saving.current) return;
     saving.current = true;
     try {
-      await saveAgentSettings(
-        prepareAgentSettings(settings, getPreferenceValues<Preferences>()),
-      );
+      await saveAgentSettings(prepareAgentSettings(settings));
       await onSave?.();
       await showToast({
         style: Toast.Style.Success,
         title: "Agent Settings Saved",
       });
-      pop();
+      if (onSave) pop();
     } catch (failure) {
       setError(failure instanceof Error ? failure.message : String(failure));
     } finally {
       saving.current = false;
     }
   }
+
+  if (loading) return <Form navigationTitle="Remote Agents" isLoading />;
 
   const hermes = settings.backend === "hermes";
   const credentialTitle = hermes
@@ -172,7 +172,7 @@ export default function AgentSettingsView({
         <Form.Description
           key={`${settings.backend}-credential`}
           title={credentialTitle}
-          text={`${credentialConfigured ? "Configured" : "Not configured"}. Use Actions > Set ${credentialTitle} for the secure native password field. Raycast's native preferences list all fields; this page shows only the selected backend.`}
+          text={`${credentialConfigured ? "Configured" : "Not configured"}. Use Actions > Set ${credentialTitle} for the secure native password field. Backend and server URLs are configured only on this page.`}
         />
       ) : (
         <Form.Description
@@ -182,7 +182,7 @@ export default function AgentSettingsView({
       )}
       <Form.Description
         title="Saving"
-        text="Save Settings applies your choice. Each backend keeps its own URL when you switch. Reopen Ask AI after changing credentials. Other AI tools keep using the direct provider."
+        text="Save Settings applies your choice everywhere. Pocket AI Settings and the Remote Agents command open this same page. Each backend keeps its own URL when you switch. Reopen Ask AI after changing credentials. Other AI tools keep using the direct provider."
       />
       {error && settings.backend === "direct" && (
         <Form.Description title="Cannot Save Settings" text={error} />

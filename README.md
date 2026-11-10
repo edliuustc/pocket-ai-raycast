@@ -15,6 +15,7 @@ Ask questions, look up words, translate, and polish writing without opening anot
 - **Streaming conversations:** responses arrive progressively; follow-ups retain context.
 - **Bring your own provider:** configure a base URL and optional API key. A VS Code Copilot bridge can be used if you already have one.
 - **Remote harnesses:** optionally use Ask AI as a streaming frontend for your own Hermes or OpenClaw agent, with server-owned sessions, tool activity, approvals, and cancellation.
+- **One agent settings screen:** the Remote Agents command and home dashboard share the saved backend/server configuration. Native preferences keep secure keys, not a second backend selector.
 - **Model dropdown:** discover and select the models your provider exposes.
 - **Ready-made commands:** Ask AI, Dictionary, Translator, and Polish Text.
 - **Your own commands:** create from templates; customize prompts, placeholders, models, and endpoint overrides.
@@ -56,8 +57,8 @@ The installer checks prerequisites, installs locked dependencies, requests sourc
 ```json
 {
   "status": "installed",
-  "version": "1.2.0",
-  "commands": 8,
+  "version": "1.2.1",
+  "commands": 9,
   "watcherRunning": false,
   "uiVerification": "required"
 }

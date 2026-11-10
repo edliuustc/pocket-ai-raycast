@@ -105,7 +105,9 @@ Direct Model stays the default. Never inherit its API key into an agent backend 
 
 Gateway credentials belong in native password preferences. Persist OpenClaw private identity/device tokens only through the authenticated-encryption vault; never add plaintext secret files or log credentials. Keep the official client/protocol dependency versions paired. TypeScript uses bundler module resolution for their ESM exports; the Raycast CLI owns actual bundling.
 
-Remote Agents settings must show only the selected backend's fields and preserve both endpoint drafts. Persist only allowlisted backend/URL values and their native snapshot, never a spread of preferences. Native fields remain static. Settings changes must not replay a launch query or cancel accepted remote work.
+Remote Agents settings must show only the selected backend's fields and preserve both endpoint drafts. The dashboard and `remote-agents` command share one form and version-2 settings record. Never reintroduce duplicate native backend/URL selectors: native preferences cannot be written through the public SDK. Migrate legacy form snapshots once; missing removed native fields must not reset saved choices, and stale native values must not override canonical settings. Persist only allowlisted nonsecret values, never a spread of preferences. Credentials remain native password preferences. Settings changes must not replay a launch query or cancel accepted remote work.
+
+Remote rich rendering reserves a stable response item before the first token, like direct tools. Never make a growing answer replace the selected question/activity row or inject a placeholder into the real remote transcript. Completed runs must not keep selecting obsolete approval rows.
 
 Mock protocol checks do not establish live compatibility with a user's remote server. Never claim a cloud test without a configured server and an observed response.
 

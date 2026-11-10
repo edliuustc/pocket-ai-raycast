@@ -1,4 +1,9 @@
-import { AgentApproval, AgentMessage, AgentState } from "./agents/types";
+import {
+  AgentApproval,
+  AgentMessage,
+  AgentState,
+  terminal,
+} from "./agents/types";
 import { responseRows } from "./response-rows";
 
 export function agentPresentation(
@@ -9,7 +14,12 @@ export function agentPresentation(
   error: string,
   rich: boolean,
 ) {
-  const rows = messages.flatMap((message, index) =>
+  const pendingApprovals = terminal(state) ? [] : approvals;
+  const displayMessages =
+    rich && state === "running" && messages.at(-1)?.role === "user"
+      ? [...messages, { role: "assistant" as const, text: "" }]
+      : messages;
+  const rows = displayMessages.flatMap((message, index) =>
     (rich ? [message.text] : responseRows(message.text)).map((text, line) => ({
       id: rich ? `message-${index}` : `message-${index}-${line}`,
       text,
@@ -29,17 +39,17 @@ export function agentPresentation(
   const itemIds = [
     ...rows.map((row) => row.id),
     ...progress.map((_, index) => `progress-${index}`),
-    ...approvals.map((approval) => `approval-${approval.id}`),
+    ...pendingApprovals.map((approval) => `approval-${approval.id}`),
     ...(status ? ["agent-state"] : []),
     ...(error ? ["agent-error"] : []),
   ];
   const latestId = error
     ? "agent-error"
-    : approvals.length
-      ? `approval-${approvals.at(-1)!.id}`
+    : pendingApprovals.length
+      ? `approval-${pendingApprovals.at(-1)!.id}`
       : status
         ? "agent-state"
         : rows.at(-1)?.id ||
           (progress.length ? `progress-${progress.length - 1}` : undefined);
-  return { rows, status, itemIds, latestId };
+  return { rows, status, itemIds, latestId, approvals: pendingApprovals };
 }

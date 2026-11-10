@@ -11,7 +11,24 @@ export interface AgentSettings {
 }
 
 export interface SavedAgentSettings extends AgentSettings {
-  native: AgentSettings;
+  version?: 2;
+  native?: AgentSettings;
+}
+
+export async function readAgentSettings(
+  read: () => Promise<string | undefined>,
+  write: (settings: SavedAgentSettings) => Promise<void>,
+  preferences: NativeSettings,
+): Promise<SavedAgentSettings | undefined> {
+  const raw = await read();
+  if (!raw) return undefined;
+  const saved = JSON.parse(raw) as SavedAgentSettings;
+  if (saved.version === 2) return saved;
+  const migrated = prepareAgentSettings(
+    effectiveAgentSettings(preferences, saved),
+  );
+  await write(migrated);
+  return migrated;
 }
 
 type NativeSettings = Pick<
@@ -35,18 +52,27 @@ export function effectiveAgentSettings(
 ): AgentSettings {
   const native = nativeAgentSettings(preferences);
   if (!saved) return native;
+  if (saved.version === 2 || !saved.native)
+    return {
+      backend: saved.backend,
+      hermesUrl: saved.hermesUrl,
+      openclawUrl: saved.openclawUrl,
+    };
   const snapshot = nativeSnapshot(native);
-  // Honor subsequent edits in native preferences without losing unrelated form edits.
+  // Import legacy edits only when the host still supplies the removed preference.
   return {
     backend:
+      preferences.askBackend !== undefined &&
       snapshot.backend !== saved.native.backend
         ? native.backend
         : saved.backend,
     hermesUrl:
+      preferences.hermesUrl !== undefined &&
       snapshot.hermesUrl !== saved.native.hermesUrl
         ? native.hermesUrl
         : saved.hermesUrl,
     openclawUrl:
+      preferences.openclawUrl !== undefined &&
       snapshot.openclawUrl !== saved.native.openclawUrl
         ? native.openclawUrl
         : saved.openclawUrl,
@@ -65,7 +91,6 @@ function nativeSnapshot(settings: AgentSettings): AgentSettings {
 
 export function prepareAgentSettings(
   settings: AgentSettings,
-  preferences: NativeSettings,
 ): SavedAgentSettings {
   for (const [label, value] of [
     ["Hermes", settings.hermesUrl],
@@ -83,11 +108,11 @@ export function prepareAgentSettings(
       );
     }
   }
-  const result = {
+  const result: SavedAgentSettings = {
+    version: 2,
     backend: settings.backend,
     hermesUrl: settings.hermesUrl,
     openclawUrl: settings.openclawUrl,
-    native: nativeSnapshot(nativeAgentSettings(preferences)),
   };
   if (settings.backend === "hermes") {
     result.hermesUrl = normalizeAgentUrl("hermes", settings.hermesUrl);

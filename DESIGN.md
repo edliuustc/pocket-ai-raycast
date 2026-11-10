@@ -1,6 +1,6 @@
 # Pocket AI: current design specification
 
-- **Status:** implemented baseline for Pocket AI 1.2.0
+- **Status:** implemented baseline for Pocket AI 1.2.1
 - **Updated:** November 10, 2026
 - **Scope:** product behavior, interaction design, architecture, persistence, and installation.
 
@@ -34,7 +34,7 @@ The user-facing product name is **Pocket AI**. The manifest name `mae-ai`, exist
 
 ## 2. Commands and entry points
 
-The manifest declares eight commands:
+The manifest declares nine commands:
 
 | Command ID           | Display title         | Purpose                                                          |
 | -------------------- | --------------------- | ---------------------------------------------------------------- |
@@ -45,6 +45,7 @@ The manifest declares eight commands:
 | `configure-provider` | Configure AI Provider | Open native extension preferences for the endpoint and API key.  |
 | `create-command`     | Add New Command       | Open the template-based command editor.                          |
 | `manage-tools`       | Pocket AI Settings    | Edit, add, delete, restore, and launch commands.                 |
+| `remote-agents`      | Remote Agents         | Open the shared Ask AI backend/server settings screen.           |
 | `custom-tool`        | Run Custom AI Tool    | Dispatch a saved tool by ID, or show settings if no ID is given. |
 
 Suggested shortcuts are `ask` / Ctrl+Alt+1, `df` / Ctrl+Alt+2, `tr` / Ctrl+Alt+3, and `pl` / Ctrl+Alt+4. These are suggestions, not changes made by the installer. Users assign them in Raycast.
@@ -218,11 +219,15 @@ Source: [`src/lib/stream.ts`](src/lib/stream.ts), [`src/lib/models.ts`](src/lib/
 
 The dashboard's **Remote Agents** entry opens a dynamic Form. Its backend dropdown shows only Hermes URL/credential guidance for Hermes, only OpenClaw URL/credential guidance for OpenClaw, and neither for Direct Model. Switching preserves both endpoint drafts; **Save Settings** persists the backend and URLs. Selected-backend credential actions open secure native password preferences, which remain static and cannot hide other backends' fields.
 
-Existing native backend/URL preferences supply the initial settings. Saved settings include an explicit allowlist of the backend, both URLs, and their native-value snapshot; native URLs are represented by SHA-256 fingerprints so even credentials mistakenly embedded in legacy preferences are never copied. A later native value differing from its snapshot overrides only that field. Normal edits use the dynamic page. Settings changes refresh Ask AI routing, isolate component state by backend/URL/credential scope, and do not replay the original launch query or cancel accepted remote work.
+The dashboard and standalone **Remote Agents** command open the same form backed by one versioned settings record. Duplicate backend/URL native preferences are removed: the public API cannot write those host-owned controls, so two-way synchronization would be misleading. Native preferences retain secure credential fields. Saved settings explicitly allowlist version, backend, and both URLs; credentials are never copied.
+
+Existing saved form settings migrate once from their legacy native-value snapshots. A legacy native edit is imported only if the host still supplies that preference; missing removed fields must not overwrite saved choices with defaults. Canonical settings never yield to stale native values. Users who configured only the old native preferences and have no saved form record may need to select their backend/URL once in Remote Agents after updating. Settings changes refresh Ask AI routing, isolate component state by backend/URL/credential scope, and do not replay the original launch query or cancel accepted remote work.
 
 No agent inherits `apiKey`, per-tool endpoint overrides, or direct-provider model selections. URLs reject embedded credentials/query/fragment and preserve proxy/profile prefixes. Hermes accepts HTTP(S); OpenClaw normalizes HTTP(S) to WS(S).
 
 Remote mode retains the controlled top-bar query/follow-up input, tool prompt/placeholders, rich/plain views, formatted conversation/copy, and shared follow-latest policy. Text rendering is batched around 40 ms and selection updates around 120 ms. Use the loading indicator, not connecting/completed status rows. Keep stopped/failed/uncertain/stopping states, bounded recent activity, and explicit approval review visible. Only one active/unconfirmed run is writable at a time; follow-ups wait for settlement rather than accidentally starting parallel tasks.
+
+In rich mode, reserve the response row as soon as a running run has its user message, before the first token. The placeholder and actual assistant message share the same ID, so the preview stays on the response rather than the question/activity. This is presentation-only and never adds synthetic messages to a remote transcript. Terminal runs no longer render stale approval rows, which otherwise take selection priority over the completed answer.
 
 The dropdown discovers **agent targets**, not raw LLMs. Hermes uses `/v1/models` for the configured profile and does not send its virtual profile ID as a native underlying model override. OpenClaw uses `agents.list`. The harness controls its model, tools, web access, memory, and remote environment.
 
@@ -270,7 +275,7 @@ interface Tool {
 | Direct conversation turns | React state for the current invocation only.                                                                                 |
 | Remote session pointers   | `pocket-ai.agent-session.v1:<scope>:<agent>`: session, run, pending-submission identifiers; no prompt/transcript.            |
 | Remote agent selection    | `pocket-ai.agent-target.v1:<scope>`.                                                                                         |
-| Remote backend settings   | `pocket-ai.agent-settings.v1`: backend, both URLs, and native-value snapshot; never credentials.                             |
+| Remote backend settings   | `pocket-ai.agent-settings.v1`: version 2 backend and both URLs; legacy snapshots migrate once; never credentials.            |
 | OpenClaw device material  | `pocket-ai.agent-device.v1:<scope>`: authenticated-encrypted identity/device tokens, protected by native gateway credential. |
 | Aliases and Quicklinks    | Raycast-owned settings, outside the tool registry.                                                                           |
 | Installer cache/logs      | `.pocket-ai-install` within the source folder; excluded from distribution.                                                   |
@@ -297,7 +302,7 @@ Raycast root search / alias / hotkey / Quicklink
         -> scoped session receipts + encrypted device vault
 
 Pocket AI Settings -> ToolEditor -> tool registry
-                   -> AgentSettingsView -> nonsecret backend/URLs + native snapshot
+                   -> AgentSettingsView -> canonical nonsecret backend/URLs
                    -> native extension preferences
 ```
 
@@ -347,7 +352,7 @@ Source: [`install.ps1`](install.ps1), [`scripts/install-functions.ps1`](scripts/
 | Deletion      | Deleted tools cannot run; built-ins restore their prior settings; custom deletion is permanent.                                               |
 | Scrolling     | Full-width output follows new rows; rich mode follows messages. Explicit pause permits history browsing; resume/follow-up restores following. |
 | Credentials   | Different-origin overrides never inherit the default key; keys do not appear in source packages.                                              |
-| Installation  | Actual normal import produces eight compiled commands and leaves no developer watcher.                                                        |
+| Installation  | Actual normal import produces nine compiled commands and leaves no developer watcher.                                                         |
 | Distribution  | Anonymous GitHub release download matches its checksum and includes required source/installer files.                                          |
 
 Automated coverage is in [`tests`](tests): streaming and provider errors, model discovery, session construction, templates/language, registry deletion/restoration, row wrapping, scrolling policy, and PowerShell installer guards/build validation.

@@ -7,15 +7,15 @@ Raycast is the frontend; the remote harness owns model selection, tools, web acc
 ## Setup in Raycast
 
 1. Install/update Pocket AI using [the Windows installer](README.md#install-on-windows) or the [Mac source guide](INSTALL-MACOS.md).
-2. Open **Pocket AI Settings > Remote Agents**.
+2. Open **Pocket AI Settings > Remote Agents**, or launch the standalone **Remote Agents** command.
 3. Choose **Hermes Agent** or **OpenClaw Agent** in **Ask AI Backend**.
 4. Enter that backend's server URL. Only the selected backend's fields appear; switching keeps each URL draft.
 5. Use **Actions > Set Hermes API Key** or **Set OpenClaw Gateway Token / Password** to open Raycast's secure native password preferences. The direct-model API key is never inherited. Return to the Remote Agents page and choose **Save Settings** to apply the backend and URLs.
 6. Reopen **Ask AI**. Choose an advertised agent from the dropdown; type in Raycast's top bar and press Enter.
 
-The Pocket AI **Remote Agents** page is dynamic: Hermes fields disappear when you choose OpenClaw, and both disappear for Direct Model. Raycast's separate native preferences screen is static and still lists all advanced fields. Credentials remain there; Pocket AI cannot conditionally hide native preference fields.
+The Pocket AI **Remote Agents** page is dynamic: Hermes fields disappear when you choose OpenClaw, and both disappear for Direct Model. Both entry points open the same form and settings record. Native preferences retain secure password fields but no longer contain conflicting backend/URL selectors: Raycast's public API cannot update those controls from the home form.
 
-Existing native backend/URL settings are honored until you save the new page. Saved settings contain only the backend, both URLs, and a nonsecret snapshot of native values (URL fingerprints, not copies of potentially sensitive legacy URLs). A later native value change overrides that field without discarding unrelated saved settings; use the Remote Agents page for normal backend/URL changes. Saving never resends your original launch query or cancels an already accepted remote run.
+Existing saved form settings migrate automatically to the single versioned record. Removed or stale native values cannot reset that choice afterward. If you previously used only native preferences and never saved this form, choose your backend/server URL once here after upgrading; native credentials remain unchanged. Saving never resends your original launch query or cancels an already accepted remote run. The home dashboard shows the saved Ask AI mode.
 
 The dropdown selects an agent/profile, **not an underlying LLM**. The harness keeps its own configured model. For Hermes, a profile is selected by the server URL, including `/p/<profile>` when applicable. Its advertised profile appears in the dropdown. For OpenClaw, accessible agents come from `agents.list`.
 
@@ -88,6 +88,7 @@ The device private key and issued device tokens are AES-256-GCM encrypted before
 - Queries and follow-ups use the top bar. Rich Markdown replies render directly in the native preview; Actions can switch to full-width streaming text. Markdown image URLs are preserved; binary attachments are not implemented.
 - Routine connecting and successfully completed rows are hidden; the loading bar indicates active work. Failure, uncertainty, stopping/stopped states, tool activity, and approvals remain visible.
 - Shared selection following advances to new messages in rich mode or new rows in full-width text. Native Markdown-pane scrolling is controlled by Raycast, not an extension scroll API.
+- Rich runs select a stable response slot before the first token, keeping the preview on the answer as tokens arrive. Completed runs discard obsolete approval rows instead of leaving them selected.
 - Select an approval row to review its details, then choose **Approve Once** or **Deny**. No blanket/always approval is offered. Deny-only requests do not show approval.
 - **Stop Remote Run** sends a server-side stop/abort. “Stopping” means the request was made, not that remote execution has finished; wait for its terminal state.
 - Closing Raycast's view disconnects the frontend; it does **not** cancel already accepted remote work.

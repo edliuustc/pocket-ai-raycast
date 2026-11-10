@@ -80,7 +80,10 @@ In Pocket AI Settings > Remote Agents, choose Hermes Agent or OpenClaw Agent
 as the Ask AI Backend. Only that backend's fields appear. Enter its server URL
 and Save Settings; switching keeps both URLs. Use Actions > Set Hermes API Key
 or Set OpenClaw Gateway Token / Password for its native secure password field.
-Raycast's separate native preferences screen always lists all advanced fields.
+The standalone Remote Agents command opens the same settings as the home page.
+Native preferences contain secure keys, not a duplicate backend/URL selector.
+Existing saved form settings migrate automatically. If you only used the old
+native backend/URL fields, choose them once in Remote Agents after upgrading.
 Reopen Ask AI and choose an advertised agent from the dropdown.
 Direct Model stays the default; Dictionary, Translator, Polish, and custom
 tools keep their direct provider. See REMOTE-AGENTS.md for server setup,

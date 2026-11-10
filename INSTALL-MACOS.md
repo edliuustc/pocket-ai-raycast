@@ -72,7 +72,9 @@ Keep credentials out of URLs, prompts, terminal commands, and screenshots. Provi
 
 ### Hermes or OpenClaw
 
-Open **Pocket AI Settings > Remote Agents**, choose a backend, and enter its URL. Only the selected backend's fields appear. Use its credential action to set the corresponding secure native password preference, return to the Remote Agents page, and **Save Settings**. Reopen **Ask AI** and choose an advertised agent.
+Open **Pocket AI Settings > Remote Agents**, or launch **Remote Agents** directly, choose a backend, and enter its URL. Both entry points use the same settings. Only the selected backend's fields appear. Use its credential action to set the corresponding secure native password preference, return to the Remote Agents page, and **Save Settings**. Reopen **Ask AI** and choose an advertised agent.
+
+Backend/URL selectors have been removed from native preferences to avoid conflicting copies; secure keys remain there. Existing saved form settings migrate automatically. If you only configured the old native backend/URL fields, choose them once in Remote Agents after updating.
 
 For an existing remote SSH server, a Mac tunnel can use:
 

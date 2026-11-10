@@ -638,7 +638,7 @@ export default function RemoteAgentView({
           ))}
         </List.Section>
       )}
-      {approvals.map((approval) => (
+      {presentation.approvals.map((approval) => (
         <List.Item
           key={approval.id}
           id={`approval-${approval.id}`}
