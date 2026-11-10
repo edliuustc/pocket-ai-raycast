@@ -79,6 +79,7 @@ PowerShell installer tests do not require Pester. No API credentials, provider s
 
 - `src\components\tool-command.tsx`: top-bar input, streamed response rows, follow-up conversations, model dropdown, pause/resume following.
 - `src\components\settings-view.tsx`: edit/add/delete/restore dashboard.
+- `src\components\agent-settings.tsx` and `src\lib\agent-settings.ts`: conditional backend settings, nonsecret persistence, and native-value compatibility.
 - `src\components\tool-editor.tsx`: shared command settings and templates.
 - `src\hooks\use-models.ts`: provider model discovery and remembered per-tool selection.
 - `src\lib\storage.ts`: saved tool registry and migration. Preserve saved data and deleted built-in tombstones.
@@ -95,6 +96,8 @@ Keep the top search bar as the query/follow-up input. Do not regress to a separa
 Direct Model stays the default. Never inherit its API key into an agent backend or automatically route dictionary/translation/polish/custom tools to remote agents. Remote work continues when the UI closes. Do not resubmit accepted/uncertain work, interpret Hermes `unknown` as completed, bypass OpenClaw device pairing, or request administrator scopes. Changing the endpoint, backend, credential, or selected agent must isolate session state.
 
 Gateway credentials belong in native password preferences. Persist OpenClaw private identity/device tokens only through the authenticated-encryption vault; never add plaintext secret files or log credentials. Keep the official client/protocol dependency versions paired. TypeScript uses bundler module resolution for their ESM exports; the Raycast CLI owns actual bundling.
+
+Remote Agents settings must show only the selected backend's fields and preserve both endpoint drafts. Persist only allowlisted backend/URL values and their native snapshot, never a spread of preferences. Native fields remain static. Settings changes must not replay a launch query or cancel accepted remote work.
 
 Mock protocol checks do not establish live compatibility with a user's remote server. Never claim a cloud test without a configured server and an observed response.
 

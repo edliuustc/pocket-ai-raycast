@@ -7,7 +7,6 @@ import {
   Keyboard,
   List,
   LocalStorage,
-  openExtensionPreferences,
   showToast,
   Toast,
   useNavigation,
@@ -35,6 +34,7 @@ import { responseRows } from "../lib/response-rows";
 import { FollowLatestPolicy } from "../lib/scroll-policy";
 import { renderPrompt, Tool, toolPlaceholder } from "../lib/tools";
 import SettingsView from "./settings-view";
+import AgentSettingsView from "./agent-settings";
 
 function ApprovalReview({
   approval,
@@ -86,12 +86,14 @@ export default function RemoteAgentView({
   backend,
   url,
   secret,
+  onSettingsChange,
 }: {
   tool: Tool;
   initialQuery: string;
   backend: AgentBackend;
   url: string;
   secret: string;
+  onSettingsChange: () => Promise<void>;
 }) {
   const { push } = useNavigation();
   const config = useMemo(
@@ -547,15 +549,15 @@ export default function RemoteAgentView({
           shortcut={Keyboard.Shortcut.Common.New}
           onAction={newConversation}
         />
-        <Action
+        <Action.Push
           title="Configure Remote Agents"
           icon={Icon.Gear}
-          onAction={openExtensionPreferences}
+          target={<AgentSettingsView onSave={onSettingsChange} />}
         />
         <Action
           title="Pocket AI Settings"
           icon={Icon.Gear}
-          onAction={() => push(<SettingsView />)}
+          onAction={() => push(<SettingsView onChange={onSettingsChange} />)}
         />
       </ActionPanel>
     );

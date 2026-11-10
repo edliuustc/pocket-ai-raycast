@@ -34,7 +34,13 @@ import {
 import SettingsView from "./settings-view";
 import ToolEditor, { languages } from "./tool-editor";
 import RemoteAgentView from "./remote-agent-view";
-import { normalizeAgentUrl } from "../lib/agents/types";
+import { agentScope, normalizeAgentUrl } from "../lib/agents/types";
+import {
+  effectiveAgentSettings,
+  SavedAgentSettings,
+} from "../lib/agent-settings";
+import { loadAgentSettings } from "../lib/agent-settings-storage";
+import AgentSettingsView from "./agent-settings";
 
 interface Request {
   id: number;
@@ -644,9 +650,16 @@ export default function ToolCommand({
   const [tool, setTool] = useState<Tool>();
   const [error, setError] = useState("");
   const [missing, setMissing] = useState(false);
+  const [agentSettings, setAgentSettings] = useState<SavedAgentSettings>();
+  const [launchQuery, setLaunchQuery] = useState(initialQuery);
   const reload = useCallback(async () => {
     try {
-      const tools = await loadTools();
+      const [tools, saved] = await Promise.all([
+        loadTools(),
+        id === "ask-ai" ? loadAgentSettings() : Promise.resolve(undefined),
+      ]);
+      setLaunchQuery("");
+      setAgentSettings(saved);
       const found = tools.find((candidate) => candidate.id === id);
       setTool(found);
       setMissing(!found);
@@ -661,9 +674,13 @@ export default function ToolCommand({
   }, [id]);
   useEffect(() => {
     let active = true;
-    loadTools()
-      .then((tools) => {
+    Promise.all([
+      loadTools(),
+      id === "ask-ai" ? loadAgentSettings() : Promise.resolve(undefined),
+    ])
+      .then(([tools, saved]) => {
         if (!active) return;
+        setAgentSettings(saved);
         const found = tools.find((candidate) => candidate.id === id);
         if (found) setTool(found);
         else {
@@ -716,25 +733,27 @@ export default function ToolCommand({
   if (!tool)
     return <List isLoading searchBarPlaceholder="Loading Pocket AI..." />;
   const preferences = getPreferenceValues<Preferences>();
-  const backend = preferences.askBackend || "direct";
+  const settings = effectiveAgentSettings(preferences, agentSettings);
+  const backend = settings.backend;
   if (id === "ask-ai" && backend !== "direct") {
     try {
+      const url = normalizeAgentUrl(
+        backend,
+        backend === "hermes" ? settings.hermesUrl : settings.openclawUrl,
+      );
+      const secret =
+        backend === "hermes"
+          ? preferences.hermesKey || ""
+          : preferences.openclawToken || "";
       return (
         <RemoteAgentView
+          key={agentScope({ backend, url, secret })}
           tool={tool}
-          initialQuery={initialQuery}
+          initialQuery={launchQuery}
           backend={backend}
-          url={normalizeAgentUrl(
-            backend,
-            backend === "hermes"
-              ? preferences.hermesUrl || "http://127.0.0.1:8642"
-              : preferences.openclawUrl || "ws://127.0.0.1:18789",
-          )}
-          secret={
-            backend === "hermes"
-              ? preferences.hermesKey || ""
-              : preferences.openclawToken || ""
-          }
+          url={url}
+          secret={secret}
+          onSettingsChange={reload}
         />
       );
     } catch (failure) {
@@ -742,9 +761,9 @@ export default function ToolCommand({
         <List
           actions={
             <ActionPanel>
-              <Action
+              <Action.Push
                 title="Configure Remote Agents"
-                onAction={openExtensionPreferences}
+                target={<AgentSettingsView onSave={reload} />}
               />
             </ActionPanel>
           }
@@ -760,7 +779,7 @@ export default function ToolCommand({
   return (
     <QueryView
       tool={tool}
-      initialQuery={initialQuery}
+      initialQuery={launchQuery}
       onToolChange={setTool}
       onToolsChanged={reload}
     />

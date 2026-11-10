@@ -51,7 +51,7 @@ The installer checks prerequisites, installs locked dependencies, requests sourc
 ```json
 {
   "status": "installed",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "commands": 8,
   "watcherRunning": false,
   "uiVerification": "required"
@@ -123,7 +123,7 @@ No bridge implementation, GitHub Copilot credentials, or provider access is bund
 
 ## Connect a remote agent
 
-In **Pocket AI Settings > Remote Agents**, choose **Hermes Agent** or **OpenClaw Agent** as the **Ask AI Backend**, then enter its separate URL and password-type credential. Reopen Ask AI and choose an advertised agent from the dropdown. **Direct Model remains the default**; other tools continue using the direct provider.
+In **Pocket AI Settings > Remote Agents**, choose **Hermes Agent** or **OpenClaw Agent**, enter its URL, and **Save Settings**. Only the selected backend's fields appear; each backend keeps its own URL. Use **Actions > Set Hermes API Key** or **Set OpenClaw Gateway Token / Password** for its secure native password field. Reopen Ask AI and choose an advertised agent from the dropdown. **Direct Model remains the default**; other tools continue using the direct provider.
 
 See [REMOTE-AGENTS.md](REMOTE-AGENTS.md) for SSH/private ingress, server setup, OpenClaw pairing, session recovery, tool approvals, and precise supported protocol/verification boundaries. Tools execute on the agent's machine; web access depends on its configured harness tools.
 
@@ -151,7 +151,7 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 ## Settings and current limits
 
 - Command management is in the **Pocket AI Settings command**, not embedded in Raycast's native preferences page.
-- Native preferences contain direct-provider URL/key and the optional Ask AI backend/remote credentials. Raycast does not expose arbitrary Add/Delete controls there.
+- Native preferences contain direct-provider URL/key, remote password credentials, and legacy backend/URL fields. They cannot hide fields conditionally; use **Pocket AI Settings > Remote Agents** for the dynamic backend settings.
 - Deleting a built-in disables it in Pocket AI; restore it with its previous settings from the dashboard.
 - Raycast owns static command rows and Quicklinks. Disable/remove their shortcut entries separately if you no longer want them listed.
 - Custom placeholders apply inside an open command. Root-search argument hints come from the static manifest.

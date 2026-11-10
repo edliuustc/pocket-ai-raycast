@@ -1,6 +1,6 @@
 {
   "name": "mae-ai",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "private": true,
   "title": "Pocket AI",
   "description": "AI answers, definitions, translations, and writing help right in Raycast's search bar, powered by your own provider.",
@@ -150,7 +150,7 @@
       "name": "askBackend",
       "type": "dropdown",
       "title": "Ask AI Backend",
-      "description": "Choose a direct model or your own remote agent. Dictionary, Translator, Polish, and custom tools keep using the direct provider.",
+      "description": "Advanced legacy fallback. Use Pocket AI Settings > Remote Agents for backend-specific settings that switch dynamically. Dictionary, Translator, Polish, and custom tools keep using the direct provider.",
       "required": false,
       "default": "direct",
       "data": [
@@ -172,7 +172,7 @@
       "name": "hermesUrl",
       "type": "textfield",
       "title": "Hermes Server URL",
-      "description": "Hermes API server root, including /p/profile if used. Prefer a local SSH tunnel or HTTPS private ingress. Remote tools run on that server.",
+      "description": "Advanced legacy fallback. Set this URL in Pocket AI Settings > Remote Agents, which shows only the chosen backend. Include /p/profile if used.",
       "required": false,
       "default": "http://127.0.0.1:8642"
     },
@@ -187,7 +187,7 @@
       "name": "openclawUrl",
       "type": "textfield",
       "title": "OpenClaw Gateway URL",
-      "description": "Native WebSocket gateway URL. Use ws://127.0.0.1:18789 through SSH, or a trusted wss:// endpoint. Device pairing may require approval on the server.",
+      "description": "Advanced legacy fallback. Set this URL in Pocket AI Settings > Remote Agents. Use a loopback SSH tunnel or trusted wss:// endpoint.",
       "required": false,
       "default": "ws://127.0.0.1:18789"
     },
@@ -204,7 +204,7 @@
     "dev": "ray develop",
     "lint": "eslint src",
     "typecheck": "tsc --noEmit",
-    "test": "node --import tsx --test tests\\stream.test.ts tests\\tools.test.ts tests\\models.test.ts tests\\response-rows.test.ts tests\\session.test.ts tests\\scroll-policy.test.ts tests\\agents.test.ts",
+    "test": "node --import tsx --test tests\\stream.test.ts tests\\tools.test.ts tests\\models.test.ts tests\\response-rows.test.ts tests\\session.test.ts tests\\scroll-policy.test.ts tests\\agents.test.ts tests\\agent-settings.test.ts",
     "test:installer": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File tests\\installer.tests.ps1",
     "package:windows": "powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts\\package.ps1",
     "format": "prettier --write .",

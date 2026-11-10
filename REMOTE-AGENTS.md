@@ -9,8 +9,13 @@ Raycast is the frontend; the remote harness owns model selection, tools, web acc
 1. Install/update Pocket AI using [the Windows installer](README.md#install-on-windows).
 2. Open **Pocket AI Settings > Remote Agents**.
 3. Choose **Hermes Agent** or **OpenClaw Agent** in **Ask AI Backend**.
-4. Enter that backend's server URL and its separate password-type credential. The direct-model API key is never inherited.
-5. Reopen **Ask AI**. Choose an advertised agent from the dropdown; type in Raycast's top bar and press Enter.
+4. Enter that backend's server URL. Only the selected backend's fields appear; switching keeps each URL draft.
+5. Use **Actions > Set Hermes API Key** or **Set OpenClaw Gateway Token / Password** to open Raycast's secure native password preferences. The direct-model API key is never inherited. Return to the Remote Agents page and choose **Save Settings** to apply the backend and URLs.
+6. Reopen **Ask AI**. Choose an advertised agent from the dropdown; type in Raycast's top bar and press Enter.
+
+The Pocket AI **Remote Agents** page is dynamic: Hermes fields disappear when you choose OpenClaw, and both disappear for Direct Model. Raycast's separate native preferences screen is static and still lists all advanced fields. Credentials remain there; Pocket AI cannot conditionally hide native preference fields.
+
+Existing native backend/URL settings are honored until you save the new page. Saved settings contain only the backend, both URLs, and a nonsecret snapshot of native values (URL fingerprints, not copies of potentially sensitive legacy URLs). A later native value change overrides that field without discarding unrelated saved settings; use the Remote Agents page for normal backend/URL changes. Saving never resends your original launch query or cancels an already accepted remote run.
 
 The dropdown selects an agent/profile, **not an underlying LLM**. The harness keeps its own configured model. For Hermes, a profile is selected by the server URL, including `/p/<profile>` when applicable. Its advertised profile appears in the dropdown. For OpenClaw, accessible agents come from `agents.list`.
 
@@ -90,7 +95,7 @@ The device private key and issued device tokens are AES-256-GCM encrypted before
 - Hermes `unknown` is not success or a retry signal; resolve that execution on the server.
 - **New Conversation** forgets the local session pointer and starts separately on the next query. It does not delete remote history. Stop a known running task first.
 
-Only session IDs, run/submission IDs, selected agent IDs, and encrypted OpenClaw device material are persisted locally. Pocket AI does not save local prompt/response history; the remote harness may retain transcripts according to its own configuration.
+Only nonsecret backend/URL settings, session IDs, run/submission IDs, selected agent IDs, and encrypted OpenClaw device material are persisted locally. Pocket AI does not save local prompt/response history; the remote harness may retain transcripts according to its own configuration.
 
 ## Troubleshooting
 
@@ -111,5 +116,7 @@ Only session IDs, run/submission IDs, selected agent IDs, and encrypted OpenClaw
 Automated tests run local HTTP/SSE and WebSocket mock gateways, including signed OpenClaw handshakes, streaming, reconnect without duplicate dispatch, session identity checks, approval identity, and remote cancellation. They do not prove compatibility with every deployed harness version. No user-owned remote Hermes/OpenClaw server or credentials were supplied for a live cloud-server test.
 
 The installed Windows Raycast frontend was also exercised against a temporary Hermes mock for its dropdown, partial streamed replies, tool activity, a same-session follow-up, and history restoration after reopening. That mock was stopped and the original Direct Model preference restored afterward.
+
+The 1.1.1 conditional-settings fix was checked in Windows Raycast: Hermes shows only its URL/key guidance, OpenClaw removes the Hermes fields, and Direct Model removes both agent configurations. Test selections were discarded without changing the saved backend or credentials.
 
 Protocol references: [Hermes API server](https://hermes-agent.nousresearch.com/docs/user-guide/features/api-server), [OpenClaw client guide](https://docs.openclaw.ai/gateway/clients), [OpenClaw protocol](https://docs.openclaw.ai/gateway/protocol).

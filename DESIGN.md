@@ -1,6 +1,6 @@
 # Pocket AI: current design specification
 
-- **Status:** implemented baseline for Pocket AI 1.1.0
+- **Status:** implemented baseline for Pocket AI 1.1.1
 - **Updated:** November 10, 2026
 - **Scope:** product behavior, interaction design, architecture, persistence, and installation.
 
@@ -208,9 +208,13 @@ Source: [`src/lib/stream.ts`](src/lib/stream.ts), [`src/lib/models.ts`](src/lib/
 
 ### Optional remote-agent backend for Ask AI
 
-**Direct Model** remains the default. Only the built-in `ask-ai` ID honors the native **Ask AI Backend** preference (`direct`, `hermes`, `openclaw`). Deleted-command checks happen before routing. Dictionary, Translator, Polish, and custom/template commands retain their existing direct-model transport.
+**Direct Model** remains the default. Only the built-in `ask-ai` ID honors the effective **Ask AI Backend** setting (`direct`, `hermes`, `openclaw`). Deleted-command checks happen before routing. Dictionary, Translator, Polish, and custom/template commands retain their existing direct-model transport.
 
-The dashboard adds a **Remote Agents** settings entry. Native preferences contain separate Hermes URL/key and OpenClaw Gateway URL/token-password fields. No agent inherits `apiKey`, per-tool endpoint overrides, or direct-provider model selections. URLs reject embedded credentials/query/fragment and preserve proxy/profile prefixes. Hermes accepts HTTP(S); OpenClaw normalizes HTTP(S) to WS(S).
+The dashboard's **Remote Agents** entry opens a dynamic Form. Its backend dropdown shows only Hermes URL/credential guidance for Hermes, only OpenClaw URL/credential guidance for OpenClaw, and neither for Direct Model. Switching preserves both endpoint drafts; **Save Settings** persists the backend and URLs. Selected-backend credential actions open secure native password preferences, which remain static and cannot hide other backends' fields.
+
+Existing native backend/URL preferences supply the initial settings. Saved settings include an explicit allowlist of the backend, both URLs, and their native-value snapshot; native URLs are represented by SHA-256 fingerprints so even credentials mistakenly embedded in legacy preferences are never copied. A later native value differing from its snapshot overrides only that field. Normal edits use the dynamic page. Settings changes refresh Ask AI routing, isolate component state by backend/URL/credential scope, and do not replay the original launch query or cancel accepted remote work.
+
+No agent inherits `apiKey`, per-tool endpoint overrides, or direct-provider model selections. URLs reject embedded credentials/query/fragment and preserve proxy/profile prefixes. Hermes accepts HTTP(S); OpenClaw normalizes HTTP(S) to WS(S).
 
 Remote mode retains the controlled top-bar query/follow-up input, tool prompt/placeholders, streamed answer rows, formatted conversation/copy, and follow-latest policy. Text rendering is batched around 40 ms and following around 120 ms. It shows a bounded six recent activity entries and explicit approval review rows. Only one active/unconfirmed run is writable at a time; follow-ups wait for settlement rather than accidentally starting parallel tasks.
 
@@ -260,6 +264,7 @@ interface Tool {
 | Direct conversation turns | React state for the current invocation only.                                                                                 |
 | Remote session pointers   | `pocket-ai.agent-session.v1:<scope>:<agent>`: session, run, pending-submission identifiers; no prompt/transcript.            |
 | Remote agent selection    | `pocket-ai.agent-target.v1:<scope>`.                                                                                         |
+| Remote backend settings   | `pocket-ai.agent-settings.v1`: backend, both URLs, and native-value snapshot; never credentials.                             |
 | OpenClaw device material  | `pocket-ai.agent-device.v1:<scope>`: authenticated-encrypted identity/device tokens, protected by native gateway credential. |
 | Aliases and Quicklinks    | Raycast-owned settings, outside the tool registry.                                                                           |
 | Installer cache/logs      | `.pocket-ai-install` within the source folder; excluded from distribution.                                                   |
@@ -286,6 +291,7 @@ Raycast root search / alias / hotkey / Quicklink
         -> scoped session receipts + encrypted device vault
 
 Pocket AI Settings -> ToolEditor -> tool registry
+                   -> AgentSettingsView -> nonsecret backend/URLs + native snapshot
                    -> native extension preferences
 ```
 

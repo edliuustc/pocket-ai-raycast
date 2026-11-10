@@ -15,6 +15,7 @@ import { useCallback, useEffect, useState } from "react";
 import { loadDeletedTools, loadTools, restoreTool } from "../lib/storage";
 import { builtInTools, Tool, toolDeeplink } from "../lib/tools";
 import ToolEditor, { confirmDeleteCommand } from "./tool-editor";
+import AgentSettingsView from "./agent-settings";
 
 export default function SettingsView({
   onChange,
@@ -99,10 +100,10 @@ export default function SettingsView({
           ]}
           actions={
             <ActionPanel>
-              <Action
+              <Action.Push
                 title="Configure Remote Agents"
                 icon={Icon.Gear}
-                onAction={openExtensionPreferences}
+                target={<AgentSettingsView onSave={changed} />}
               />
             </ActionPanel>
           }
