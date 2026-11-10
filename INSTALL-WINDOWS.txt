@@ -1,0 +1,61 @@
+Pocket AI - install on Windows
+Repository: https://github.com/edliuustc/pocket-ai-raycast
+License: MIT (see LICENSE)
+
+1. Install Raycast for Windows, open it, and sign in.
+   Pocket AI does not need Raycast Pro, but you need your own AI provider.
+
+2. Install stable Node.js 22.22.2 or newer with npm.
+   Open a new PowerShell window after installing Node.
+
+3. Download the source ZIP from the repository's Releases page, or use
+   Code > Download ZIP. Extract into a permanent folder.
+   Open PowerShell in the folder containing install.ps1 and package.json.
+
+4. Run:
+
+   powershell.exe -NoProfile -ExecutionPolicy Bypass -File .\install.ps1
+
+   The installer restores locked dependencies, briefly starts the Raycast
+   development CLI for source import, stops its own development process,
+   and verifies the persistent production build.
+   It does not need a permanent terminal or watcher.
+
+   For an alternate existing Node installation, add:
+     -NodePath "C:\Program Files\nodejs\node.exe"
+
+   For a network's approved npm mirror, add:
+     -Registry "https://your-approved-npm-registry.example"
+
+   Exit code 0 and final JSON status "installed" confirm build verification.
+   uiVerification "required" means you must still perform the next step.
+   A nonzero exit code or status "failed" is not a successful installation.
+
+5. In Raycast root search, open Pocket AI Settings.
+   Choose AI Provider and configure API Endpoint and optional API Key.
+   Use an OpenAI-compatible provider accessible from this PC.
+   If using your VS Code Copilot bridge, set it up on this PC and start
+   its API server first. Use the URL it exposes.
+
+   Default endpoint: http://127.0.0.1:23333/api/openai/v1
+   127.0.0.1 is this PC, not the original PC.
+   Leave API Key empty only if your provider requires no authentication.
+
+6. Open Ask AI, choose a model from the dropdown, and send a test question.
+   Confirm the response streams; send a follow-up to check conversation
+   context. Set aliases/hotkeys in Raycast Settings as desired.
+   Translator asks you to choose its target language.
+
+Manual fallback:
+  npm.cmd ci
+  npm.cmd run dev
+  Wait until the commands appear in Raycast, then press Ctrl+C.
+  npm.cmd run build
+
+This package contains source code and built-in defaults only.
+It does not include credentials, customized prompts, custom commands,
+model choices, translation settings, aliases, hotkeys, or conversation history.
+
+Raycast Windows 2.11.0.0 restricts direct .rayext import to internal builds.
+Use this source package rather than double-clicking a .rayext file.
+See README.md for troubleshooting and AGENTS.md for agent installation.

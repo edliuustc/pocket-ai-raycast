@@ -1,0 +1,94 @@
+Pocket AI - your AI tools in Raycast
+
+QUICK START
+Type an alias, press Space, enter your text, then press Enter:
+  ask  Ask anything
+  df   Define a word or phrase
+  tr   Translate text
+  pl   Polish text
+
+Replies stream below the top input bar. That bar clears automatically and
+becomes the follow-up input. Type another instruction and press Enter to
+continue the same conversation. Previous questions and answers stay visible.
+New Conversation starts over; Regenerate Last Response retries without
+duplicating the last question. The model dropdown is at the top right.
+
+Long replies automatically follow the latest streamed line. Selecting an
+older transcript row pauses auto-scroll so you can read without being moved.
+Ctrl+L pauses auto-scroll, or jumps to the latest line and resumes it.
+Sending a new follow-up always resumes following the newest answer.
+Raycast does not expose wheel-scroll events to extensions: use Ctrl+L to
+pause before browsing with only the mouse wheel.
+
+CUSTOMIZE EACH COMMAND
+Run Pocket AI Settings. Select any command and press Enter to edit it.
+Add New Command is the first visible entry; AI Provider opens endpoint/key
+preferences. Every command has Delete Command in its Actions and editor.
+Deleted built-ins can be restored with their previous settings from the
+Deleted Built-in Commands section. Custom command deletion is permanent.
+Raycast's static built-in command rows and manually created Quicklinks are
+host-owned: disable/remove their shortcut entries in Raycast Settings if
+you do not want them listed there. Deleted commands cannot run.
+
+From any open command, use Actions > Pocket AI Settings (Ctrl+Shift+,),
+or Customize This Tool (Ctrl+E) to edit just that command.
+This dashboard is separate from Raycast's native extension preferences,
+which only support the provider endpoint and API key fields.
+You can change its title, system prompt, input placeholder, follow-up
+placeholder, model override, and optional API endpoint override.
+Each built-in command starts with its own prompt and placeholders. Restore
+Default Prompt and Restore Default Placeholders are in the settings Actions.
+Placeholders apply to the open command's top input bar. Raycast defines the
+root argument hint in its static manifest, so that hint does not change.
+
+TRANSLATOR
+No target language is preselected and there is no global translation
+language. Choose a language inside Translator, or set Translate Into in
+that command's Customize This Tool screen. Your explicit choice is saved
+for that command. Other Language lets you enter any language.
+
+CONNECT YOUR AI PROVIDER
+Run Configure AI Provider from Raycast, or from a command's Actions:
+  API Endpoint: an OpenAI-compatible base URL ending in /v1, or its full
+                /chat/completions URL
+  API Key:      the provider's key, without the word Bearer
+
+The existing local provider is already configured:
+  http://127.0.0.1:23333/api/openai/v1
+Leave API Key empty if your provider does not require authentication.
+Keep the provider app/server running. Models are discovered automatically.
+Keys belong only in the password field, never in URLs or system prompts.
+Different-origin endpoint overrides do not receive the default API key.
+No Raycast Pro or paid Raycast AI API is required.
+
+CREATE YOUR OWN COMMAND
+Run Add New Command, or select Add New Command in Pocket AI Settings.
+Pick Ask AI, Dictionary, Translator, Polish, or Blank Command as a template.
+Customize its name, prompt, placeholders, and model, then save.
+The new command is listed in Pocket AI Settings. The standalone
+Add New Command launcher opens your new command immediately after saving.
+Choose Add This Command to Raycast (or Add Command to Raycast in the manager)
+to create a prefilled Quicklink. Assign that Quicklink your own alias/hotkey
+in Raycast Settings > Quicklinks. It opens your command's input bar.
+
+EXISTING HOTKEYS
+Ctrl+Alt+1  Ask AI
+Ctrl+Alt+2  AI Dictionary
+Ctrl+Alt+3  AI Translator
+Ctrl+Alt+4  AI Polish Text
+
+DEVELOPMENT
+Source: your repository checkout or extracted source distribution.
+Use install.ps1 for installation; see README.md and INSTALL-WINDOWS.txt.
+The included run.ps1 finds a supported Node runtime:
+  powershell -ExecutionPolicy Bypass -File .\run.ps1 Validate
+  powershell -ExecutionPolicy Bypass -File .\run.ps1 Build
+  powershell -ExecutionPolicy Bypass -File .\run.ps1 Develop
+  powershell -ExecutionPolicy Bypass -File .\run.ps1 Bundle
+
+The private local extension keeps its original internal ID for compatibility
+with saved data and shortcuts. User-facing branding is Pocket AI.
+The portable bundle is pocket-ai.rayext.
+For another Windows PC, use pocket-ai-windows-source.zip and follow
+INSTALL-WINDOWS.txt. The verified public Windows build (2.11.0.0) imports
+extensions from source; direct .rayext bundle import is internal-only.
