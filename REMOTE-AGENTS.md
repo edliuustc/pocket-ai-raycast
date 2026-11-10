@@ -21,6 +21,14 @@ The dropdown selects an agent/profile, **not an underlying LLM**. The harness ke
 
 The existing Ask AI prompt and input/follow-up placeholders still apply. Hermes receives the prompt as `instructions`. OpenClaw's chat RPC has no system-prompt override: Pocket AI includes response instructions as explicitly labeled user-message context, without replacing the harness's system prompt or tool policy.
 
+### Switch without leaving Ask AI
+
+Use **Actions > Switch AI Backend** or **Command+Shift+B** on Mac / **Ctrl+Shift+B** on Windows. Choose **Direct Model**, **Hermes Agent**, or **OpenClaw Agent**; the current choice is marked. This saves to the same settings as the home form and standalone Remote Agents command, retaining both server URLs.
+
+Direct displays its model dropdown in the top bar. Agent modes display server-advertised profiles, not an override for the harness's model. Configure server URLs/credentials through Remote Agents as before.
+
+Unsent text remains in the input bar after switching, without being sent automatically. Contexts are separate: no transcript is forwarded to another backend. Leaving Direct aborts local generation and returning starts a fresh Direct conversation with its remembered model. Leaving an agent detaches without stopping accepted remote work; returning restores its scoped session/run. Selecting the already active backend changes nothing.
+
 ## Connect across machines
 
 Prefer an existing private HTTPS/WSS ingress, or a loopback SSH tunnel. Do not enter credentials inside a URL.

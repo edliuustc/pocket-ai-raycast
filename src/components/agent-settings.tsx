@@ -13,6 +13,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   AgentSettings,
   AskBackend,
+  askBackends,
   effectiveAgentSettings,
   nativeAgentSettings,
   prepareAgentSettings,
@@ -22,12 +23,6 @@ import {
   saveAgentSettings,
 } from "../lib/agent-settings-storage";
 import { Preferences } from "../lib/preferences";
-
-const backends = [
-  { value: "direct", title: "Direct Model" },
-  { value: "hermes", title: "Hermes Agent" },
-  { value: "openclaw", title: "OpenClaw Agent" },
-] as const;
 
 export default function AgentSettingsView({
   onSave,
@@ -122,7 +117,7 @@ export default function AgentSettingsView({
           setError("");
         }}
       >
-        {[...backends]
+        {[...askBackends]
           .sort(
             (a, b) =>
               Number(b.value === settings.backend) -

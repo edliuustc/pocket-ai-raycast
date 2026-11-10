@@ -3,9 +3,11 @@ import test from "node:test";
 import { createHash } from "node:crypto";
 import {
   effectiveAgentSettings,
+  changeAgentBackend,
   prepareAgentSettings,
   readAgentSettings,
   SavedAgentSettings,
+  AskBackend,
 } from "../src/lib/agent-settings";
 
 test("existing native backend and endpoints are used until settings are saved", () => {
@@ -21,6 +23,86 @@ test("existing native backend and endpoints are used until settings are saved", 
       openclawUrl: "wss://claw.example/gateway",
     },
   );
+});
+
+test("in-tool backend changes persist to the shared settings without losing either endpoint", async () => {
+  let saved: SavedAgentSettings | undefined;
+  const native = {
+    askBackend: "direct" as const,
+    hermesUrl: "https://hermes.example/p/work/v1",
+    openclawUrl: "https://claw.example/gateway",
+    apiKey: "direct-secret",
+    hermesKey: "hermes-secret",
+    openclawToken: "claw-secret",
+  };
+  const read = async () => saved;
+  const write = async (value: SavedAgentSettings) => {
+    saved = value;
+  };
+  for (const backend of ["hermes", "openclaw", "direct"] as AskBackend[]) {
+    const updated = await changeAgentBackend(backend, read, write, native);
+    assert.equal(updated?.backend, backend);
+    assert.equal(effectiveAgentSettings(native, saved).backend, backend);
+    assert.equal(saved?.hermesUrl, "https://hermes.example/p/work");
+    assert.equal(
+      saved?.openclawUrl,
+      backend === "hermes" ? native.openclawUrl : "wss://claw.example/gateway",
+    );
+    assert.ok(!JSON.stringify(saved).includes("secret"));
+  }
+});
+
+test("selecting the current backend does not write or restart a context", async () => {
+  let writes = 0;
+  const saved = prepareAgentSettings({
+    backend: "hermes",
+    hermesUrl: "https://hermes.example",
+    openclawUrl: "unfinished draft",
+  });
+  const write = async () => {
+    writes++;
+  };
+  assert.equal(
+    await changeAgentBackend("hermes", async () => saved, write, {}),
+    undefined,
+  );
+  assert.equal(
+    await changeAgentBackend("direct", async () => undefined, write, {}),
+    undefined,
+  );
+  assert.equal(writes, 0);
+});
+
+test("invalid endpoints and storage failures do not report a successful backend switch", async () => {
+  const saved = prepareAgentSettings({
+    backend: "direct",
+    hermesUrl: "https://hermes.example",
+    openclawUrl: "unfinished draft",
+  });
+  let writes = 0;
+  await assert.rejects(
+    changeAgentBackend(
+      "openclaw",
+      async () => saved,
+      async () => {
+        writes++;
+      },
+      {},
+    ),
+  );
+  assert.equal(writes, 0);
+  await assert.rejects(
+    changeAgentBackend(
+      "hermes",
+      async () => saved,
+      async () => {
+        throw new Error("Cannot save");
+      },
+      {},
+    ),
+    /Cannot save/,
+  );
+  assert.equal(saved.backend, "direct");
 });
 
 test("switching and saving keeps distinct URLs without persisting credentials", () => {

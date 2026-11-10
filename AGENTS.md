@@ -109,6 +109,8 @@ Remote Agents settings must show only the selected backend's fields and preserve
 
 Remote rich rendering reserves a stable response item before the first token, like direct tools. Never make a growing answer replace the selected question/activity row or inject a placeholder into the real remote transcript. Completed runs must not keep selecting obsolete approval rows.
 
+Built-in Ask AI's in-tool backend menu writes the same canonical settings, preserves both URLs, and is a no-op for the current backend. Direct keeps its model dropdown; agent modes keep their profile dropdown. Preserve unsent query text as a draft across switches, but disable initial auto-submission after switching so neither the original launch query nor the draft is replayed. Keep contexts separate, abort Direct generation on departure, and detach remote work without cancelling it.
+
 Mock protocol checks do not establish live compatibility with a user's remote server. Never claim a cloud test without a configured server and an observed response.
 
 Do not claim arbitrary command-management UI can be embedded in Raycast's native preferences. User-created Quicklinks and native static command rows are host-owned.

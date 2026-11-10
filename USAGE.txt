@@ -85,6 +85,11 @@ Native preferences contain secure keys, not a duplicate backend/URL selector.
 Existing saved form settings migrate automatically. If you only used the old
 native backend/URL fields, choose them once in Remote Agents after upgrading.
 Reopen Ask AI and choose an advertised agent from the dropdown.
+Inside Ask AI, Actions > Switch AI Backend (Ctrl+Shift+B on Windows,
+Command+Shift+B on Mac) switches Direct Model / Hermes Agent / OpenClaw Agent.
+The same saved mode is used everywhere. Direct shows the model dropdown.
+Unsent text stays as a draft without auto-sending. Backend contexts stay
+separate; Direct starts fresh on return, while remote work is restored.
 Direct Model stays the default; Dictionary, Translator, Polish, and custom
 tools keep their direct provider. See REMOTE-AGENTS.md for server setup,
 SSH/private ingress, OpenClaw device pairing, and supported protocol versions.

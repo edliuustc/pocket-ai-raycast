@@ -4,6 +4,12 @@ import { createHash } from "node:crypto";
 
 export type AskBackend = "direct" | "hermes" | "openclaw";
 
+export const askBackends = [
+  { value: "direct", title: "Direct Model" },
+  { value: "hermes", title: "Hermes Agent" },
+  { value: "openclaw", title: "OpenClaw Agent" },
+] as const;
+
 export interface AgentSettings {
   backend: AskBackend;
   hermesUrl: string;
@@ -29,6 +35,20 @@ export async function readAgentSettings(
   );
   await write(migrated);
   return migrated;
+}
+
+export async function changeAgentBackend(
+  backend: AskBackend,
+  read: () => Promise<SavedAgentSettings | undefined>,
+  write: (settings: SavedAgentSettings) => Promise<void>,
+  preferences: NativeSettings,
+): Promise<SavedAgentSettings | undefined> {
+  const saved = await read();
+  const current = effectiveAgentSettings(preferences, saved);
+  if (current.backend === backend) return undefined;
+  const updated = prepareAgentSettings({ ...current, backend });
+  await write(updated);
+  return updated;
 }
 
 type NativeSettings = Pick<

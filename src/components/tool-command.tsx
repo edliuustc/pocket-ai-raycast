@@ -40,8 +40,12 @@ import {
   effectiveAgentSettings,
   SavedAgentSettings,
 } from "../lib/agent-settings";
-import { loadAgentSettings } from "../lib/agent-settings-storage";
+import {
+  loadAgentSettings,
+  switchAgentBackend,
+} from "../lib/agent-settings-storage";
 import AgentSettingsView from "./agent-settings";
+import BackendMenu, { BackendChange } from "./backend-menu";
 
 interface Request {
   id: number;
@@ -125,11 +129,15 @@ function LanguagePicker({
 function QueryView({
   tool,
   initialQuery,
+  autoSubmitInitialQuery,
+  onBackendChange,
   onToolChange,
   onToolsChanged,
 }: {
   tool: Tool;
   initialQuery: string;
+  autoSubmitInitialQuery: boolean;
+  onBackendChange?: BackendChange;
   onToolChange: (saved: Tool) => void;
   onToolsChanged: () => Promise<void>;
 }) {
@@ -247,6 +255,7 @@ function QueryView({
 
   useEffect(() => {
     if (
+      autoSubmitInitialQuery &&
       initialQuery.trim() &&
       !autoSubmitted.current &&
       !selection.loading &&
@@ -257,6 +266,7 @@ function QueryView({
       send(initialQuery);
     }
   }, [
+    autoSubmitInitialQuery,
     initialQuery,
     selection.loading,
     selection.model,
@@ -374,6 +384,13 @@ function QueryView({
                 }
         }
       />
+      {onBackendChange && (
+        <BackendMenu
+          backend="direct"
+          query={query}
+          onChange={onBackendChange}
+        />
+      )}
       {last?.answer && (
         <Action.CopyToClipboard
           title="Copy Latest Response"
@@ -507,7 +524,7 @@ function QueryView({
 
   return (
     <List
-      navigationTitle={`Pocket AI - ${tool.title}${following ? "" : " / Auto-scroll Paused"}`}
+      navigationTitle={`Pocket AI - ${tool.title}${onBackendChange ? " · Direct Model" : ""}${following ? "" : " / Auto-scroll Paused"}`}
       searchText={query}
       onSearchTextChange={setQuery}
       searchBarPlaceholder={toolPlaceholder(tool, turns.length > 0, language)}
@@ -648,14 +665,20 @@ export default function ToolCommand({
   const [error, setError] = useState("");
   const [missing, setMissing] = useState(false);
   const [agentSettings, setAgentSettings] = useState<SavedAgentSettings>();
-  const [launchQuery, setLaunchQuery] = useState(initialQuery);
+  const [launch, setLaunch] = useState({
+    query: initialQuery,
+    autoSubmit: true,
+  });
+  const launchQuery = launch.query;
+  const autoSubmitInitialQuery = launch.autoSubmit;
+  const switching = useRef(false);
   const reload = useCallback(async () => {
     try {
       const [tools, saved] = await Promise.all([
         loadTools(),
         id === "ask-ai" ? loadAgentSettings() : Promise.resolve(undefined),
       ]);
-      setLaunchQuery("");
+      setLaunch({ query: "", autoSubmit: false });
       setAgentSettings(saved);
       const found = tools.find((candidate) => candidate.id === id);
       setTool(found);
@@ -669,6 +692,24 @@ export default function ToolCommand({
       setError(failure instanceof Error ? failure.message : String(failure));
     }
   }, [id]);
+  const changeBackend: BackendChange = async (backend, draft) => {
+    if (switching.current) return;
+    switching.current = true;
+    try {
+      const saved = await switchAgentBackend(backend);
+      if (!saved) return;
+      setLaunch({ query: draft, autoSubmit: false });
+      setAgentSettings(saved);
+    } catch (failure) {
+      await showToast({
+        style: Toast.Style.Failure,
+        title: "Cannot Switch AI Backend",
+        message: failure instanceof Error ? failure.message : String(failure),
+      });
+    } finally {
+      switching.current = false;
+    }
+  };
   useEffect(() => {
     let active = true;
     Promise.all([
@@ -747,10 +788,12 @@ export default function ToolCommand({
           key={agentScope({ backend, url, secret })}
           tool={tool}
           initialQuery={launchQuery}
+          autoSubmitInitialQuery={autoSubmitInitialQuery}
           backend={backend}
           url={url}
           secret={secret}
           onSettingsChange={reload}
+          onBackendChange={changeBackend}
         />
       );
     } catch (failure) {
@@ -758,6 +801,11 @@ export default function ToolCommand({
         <List
           actions={
             <ActionPanel>
+              <BackendMenu
+                backend={backend}
+                query={launchQuery}
+                onChange={changeBackend}
+              />
               <Action.Push
                 title="Configure Remote Agents"
                 target={<AgentSettingsView onSave={reload} />}
@@ -777,6 +825,8 @@ export default function ToolCommand({
     <QueryView
       tool={tool}
       initialQuery={launchQuery}
+      autoSubmitInitialQuery={autoSubmitInitialQuery}
+      onBackendChange={id === "ask-ai" ? changeBackend : undefined}
       onToolChange={setTool}
       onToolsChanged={reload}
     />

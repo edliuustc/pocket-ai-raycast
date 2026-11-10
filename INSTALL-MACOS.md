@@ -76,6 +76,8 @@ Open **Pocket AI Settings > Remote Agents**, or launch **Remote Agents** directl
 
 Backend/URL selectors have been removed from native preferences to avoid conflicting copies; secure keys remain there. Existing saved form settings migrate automatically. If you only configured the old native backend/URL fields, choose them once in Remote Agents after updating.
 
+Inside **Ask AI**, use **Actions > Switch AI Backend** or **Command+Shift+B** to switch Direct/Hermes/OpenClaw immediately. The choice uses those same saved settings. Direct shows a model dropdown; remote modes show their advertised agent profiles. Unsent input is kept as a draft, not auto-submitted. Each backend keeps separate context; remote work continues when you switch away.
+
 For an existing remote SSH server, a Mac tunnel can use:
 
 ```bash

@@ -1,6 +1,6 @@
 # Pocket AI: current design specification
 
-- **Status:** implemented baseline for Pocket AI 1.2.1
+- **Status:** implemented baseline for Pocket AI 1.3.0
 - **Updated:** November 10, 2026
 - **Scope:** product behavior, interaction design, architecture, persistence, and installation.
 
@@ -67,6 +67,7 @@ Source: [`package.json`](package.json), [`src/custom-tool.tsx`](src/custom-tool.
 - Keep full-width wrapped list rows as an alternate view. Its formatter removes common Markdown markers and wraps at a nominal 76 columns with wide-character handling.
 - **Response View** sets the default; Actions can switch views for the current conversation. Preserve the original text for copying and **Open Formatted Conversation**, an optional full-conversation Markdown reader. This is not a custom web canvas or binary-image attachment implementation.
 - Display the model dropdown in the search bar accessory.
+- Built-in Ask AI adds **Actions > Switch AI Backend** (Ctrl+Shift+B / Command+Shift+B), with Direct Model, Hermes Agent, and OpenClaw Agent. Direct retains the model dropdown; remote modes show server-advertised agent/profile selection instead.
 
 ### Requests and conversation state
 
@@ -220,6 +221,10 @@ Source: [`src/lib/stream.ts`](src/lib/stream.ts), [`src/lib/models.ts`](src/lib/
 The dashboard's **Remote Agents** entry opens a dynamic Form. Its backend dropdown shows only Hermes URL/credential guidance for Hermes, only OpenClaw URL/credential guidance for OpenClaw, and neither for Direct Model. Switching preserves both endpoint drafts; **Save Settings** persists the backend and URLs. Selected-backend credential actions open secure native password preferences, which remain static and cannot hide other backends' fields.
 
 The dashboard and standalone **Remote Agents** command open the same form backed by one versioned settings record. Duplicate backend/URL native preferences are removed: the public API cannot write those host-owned controls, so two-way synchronization would be misleading. Native preferences retain secure credential fields. Saved settings explicitly allowlist version, backend, and both URLs; credentials are never copied.
+
+The in-tool **Switch AI Backend** submenu writes that same canonical record, retaining each server URL. Validate before persisting, serialize switch actions, and leave the current view intact if saving fails. Selecting the current backend does nothing. Only built-in Ask AI exposes this switch, including its initial/error/approval rows. Unsent input moves to the new view as a draft, never as an auto-submitted launch argument. Only the original command launch argument may auto-submit.
+
+Switching isolates contexts and does not forward transcripts between backends. Direct starts a fresh local conversation when returning; its remembered model is restored. Leaving Direct aborts its local generation. Leaving a remote backend detaches without cancelling accepted work, and returning restores that backend's scoped session/run instead of replaying the launch query.
 
 Existing saved form settings migrate once from their legacy native-value snapshots. A legacy native edit is imported only if the host still supplies that preference; missing removed fields must not overwrite saved choices with defaults. Canonical settings never yield to stale native values. Users who configured only the old native preferences and have no saved form record may need to select their backend/URL once in Remote Agents after updating. Settings changes refresh Ask AI routing, isolate component state by backend/URL/credential scope, and do not replay the original launch query or cancel accepted remote work.
 

@@ -38,6 +38,7 @@ import { Preferences } from "../lib/preferences";
 import { renderPrompt, Tool, toolPlaceholder } from "../lib/tools";
 import SettingsView from "./settings-view";
 import AgentSettingsView from "./agent-settings";
+import BackendMenu, { BackendChange } from "./backend-menu";
 
 function ApprovalReview({
   approval,
@@ -86,17 +87,21 @@ function ApprovalReview({
 export default function RemoteAgentView({
   tool,
   initialQuery,
+  autoSubmitInitialQuery,
   backend,
   url,
   secret,
   onSettingsChange,
+  onBackendChange,
 }: {
   tool: Tool;
   initialQuery: string;
+  autoSubmitInitialQuery: boolean;
   backend: AgentBackend;
   url: string;
   secret: string;
   onSettingsChange: () => Promise<void>;
+  onBackendChange: BackendChange;
 }) {
   const { push } = useNavigation();
   const config = useMemo(
@@ -387,6 +392,7 @@ export default function RemoteAgentView({
 
   useEffect(() => {
     if (
+      autoSubmitInitialQuery &&
       initialQuery &&
       ready &&
       !busy &&
@@ -481,6 +487,11 @@ export default function RemoteAgentView({
           }
           icon={Icon.Message}
           onAction={query.trim() ? send : state === "running" ? stop : send}
+        />
+        <BackendMenu
+          backend={backend}
+          query={query}
+          onChange={onBackendChange}
         />
         {session.current?.runId && (
           <Action
@@ -659,6 +670,11 @@ export default function RemoteAgentView({
                 target={
                   <ApprovalReview approval={approval} onDecide={decide} />
                 }
+              />
+              <BackendMenu
+                backend={backend}
+                query={query}
+                onChange={onBackendChange}
               />
             </ActionPanel>
           }
