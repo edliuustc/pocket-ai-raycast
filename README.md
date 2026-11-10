@@ -137,6 +137,10 @@ The top input clears after sending and becomes the follow-up input. **Ctrl+E** e
 
 Custom commands can be added to Raycast using **Add Command to Raycast**, then given their own Quicklink alias/hotkey.
 
+## Design specification
+
+See [DESIGN.md](DESIGN.md) for the current product and technical design: command flows, conversation and scrolling behavior, settings, templates, provider/model integration, storage, installation, acceptance criteria, and verified limitations.
+
 ## Settings and current limits
 
 - Command management is in the **Pocket AI Settings command**, not embedded in Raycast's native preferences page.

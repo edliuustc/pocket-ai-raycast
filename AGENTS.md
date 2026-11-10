@@ -8,6 +8,10 @@
 - Tested installation platform: Windows. Do not claim macOS installation is verified.
 - License: MIT. Preserve `LICENSE`.
 
+## Design reference
+
+Read [DESIGN.md](DESIGN.md) for the current product and technical specification before changing behavior. Keep its interaction flows, compatibility constraints, and limitations aligned with implementation; distinguish implemented behavior from unverified or proposed capabilities.
+
 ## Install for a user
 
 1. Check that the user is on Windows, has Raycast installed, and has opened and signed into it.
