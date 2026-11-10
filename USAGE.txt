@@ -33,7 +33,8 @@ you do not want them listed there. Deleted commands cannot run.
 From any open command, use Actions > Pocket AI Settings (Ctrl+Shift+,),
 or Customize This Tool (Ctrl+E) to edit just that command.
 This dashboard is separate from Raycast's native extension preferences,
-which only support the provider endpoint and API key fields.
+which support provider and remote-agent preference fields, not arbitrary
+command-management controls.
 You can change its title, system prompt, input placeholder, follow-up
 placeholder, model override, and optional API endpoint override.
 Each built-in command starts with its own prompt and placeholders. Restore
@@ -60,6 +61,17 @@ Keep the provider app/server running. Models are discovered automatically.
 Keys belong only in the password field, never in URLs or system prompts.
 Different-origin endpoint overrides do not receive the default API key.
 No Raycast Pro or paid Raycast AI API is required.
+
+OPTIONAL REMOTE AGENTS
+In Pocket AI Settings > Remote Agents, choose Hermes Agent or OpenClaw Agent
+as the Ask AI Backend. Enter its separate server URL and password-type key.
+Reopen Ask AI and choose an advertised agent from the dropdown.
+Direct Model stays the default; Dictionary, Translator, Polish, and custom
+tools keep their direct provider. See REMOTE-AGENTS.md for server setup,
+SSH/private ingress, OpenClaw device pairing, and supported protocol versions.
+Remote tools and history live on the agent machine. Closing the view detaches
+without cancelling remote work. Stop Remote Run sends a remote cancellation;
+Reconnect and Resume reloads the same session without resubmitting its task.
 
 CREATE YOUR OWN COMMAND
 Run Add New Command, or select Add New Command in Pocket AI Settings.

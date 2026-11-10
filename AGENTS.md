@@ -85,11 +85,18 @@ PowerShell installer tests do not require Pester. No API credentials, provider s
 - `src\lib\stream.ts`: OpenAI-compatible chat-completion streaming and provider errors. Do not use Raycast's paid AI API.
 - `src\lib\tools.ts`: templates and URL normalization; reject credentials in URLs.
 - `src\lib\scroll-policy.ts`: follow the latest row, ignore programmatic selection acknowledgements, pause on history navigation.
+- `src\components\remote-agent-view.tsx` and `src\lib\agents`: Ask AI-only Hermes/OpenClaw sessions, streaming, approvals, stop/reconnect, and encrypted device material. Read [REMOTE-AGENTS.md](REMOTE-AGENTS.md) before configuring a server.
 - `scripts\install-functions.ps1`: Windows PowerShell 5.1-compatible installer helpers.
 
 Retain the model-dropdown initialization workaround: render the selected item first, set both `value` and `defaultValue`, and disable host storage. A different-origin endpoint override must never inherit the default API key.
 
 Keep the top search bar as the query/follow-up input. Do not regress to a separate form. Translator must require an explicit command-scoped target language.
+
+Direct Model stays the default. Never inherit its API key into an agent backend or automatically route dictionary/translation/polish/custom tools to remote agents. Remote work continues when the UI closes. Do not resubmit accepted/uncertain work, interpret Hermes `unknown` as completed, bypass OpenClaw device pairing, or request administrator scopes. Changing the endpoint, backend, credential, or selected agent must isolate session state.
+
+Gateway credentials belong in native password preferences. Persist OpenClaw private identity/device tokens only through the authenticated-encryption vault; never add plaintext secret files or log credentials. Keep the official client/protocol dependency versions paired. TypeScript uses bundler module resolution for their ESM exports; the Raycast CLI owns actual bundling.
+
+Mock protocol checks do not establish live compatibility with a user's remote server. Never claim a cloud test without a configured server and an observed response.
 
 Do not claim arbitrary command-management UI can be embedded in Raycast's native preferences. User-created Quicklinks and native static command rows are host-owned.
 

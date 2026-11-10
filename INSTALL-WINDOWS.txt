@@ -46,6 +46,12 @@ License: MIT (see LICENSE)
    context. Set aliases/hotkeys in Raycast Settings as desired.
    Translator asks you to choose its target language.
 
+Optional remote harness:
+  Open Pocket AI Settings > Remote Agents. Choose Hermes Agent or OpenClaw
+  Agent as Ask AI Backend and enter its own server URL and password-type key.
+  Follow REMOTE-AGENTS.md for server setup, tunnels, pairing, and boundaries.
+  Direct Model remains the default; other commands continue using it.
+
 Manual fallback:
   npm.cmd ci
   npm.cmd run dev

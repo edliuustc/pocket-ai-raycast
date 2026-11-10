@@ -9,7 +9,7 @@ $names = @(
     'src', 'assets', 'tests', 'scripts', '.github',
     'package.json', 'package-lock.json', 'tsconfig.json', 'eslint.config.js',
     '.gitignore', '.gitattributes', '.prettierignore', 'install.ps1', 'run.ps1',
-    'README.md', 'AGENTS.md', 'DESIGN.md', 'LICENSE', 'USAGE.txt', 'INSTALL-WINDOWS.txt'
+    'README.md', 'AGENTS.md', 'DESIGN.md', 'REMOTE-AGENTS.md', 'LICENSE', 'USAGE.txt', 'INSTALL-WINDOWS.txt'
 )
 $paths = @($names | ForEach-Object {
     $path = Join-Path $root $_
@@ -23,7 +23,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archive = [IO.Compression.ZipFile]::OpenRead($zip)
 try {
     $entries = @($archive.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
-    foreach ($required in @('install.ps1', 'scripts/install-functions.ps1', 'README.md', 'AGENTS.md', 'DESIGN.md', 'LICENSE', 'src/components/tool-command.tsx', 'assets/pocket-ai-native.png')) {
+    foreach ($required in @('install.ps1', 'scripts/install-functions.ps1', 'README.md', 'AGENTS.md', 'DESIGN.md', 'REMOTE-AGENTS.md', 'LICENSE', 'src/components/tool-command.tsx', 'src/lib/agents/openclaw.ts', 'assets/pocket-ai-native.png')) {
         if ($required -notin $entries) { throw "The archive is incomplete: $required" }
     }
     if (@($entries | Where-Object { $_ -match '(^|/)(node_modules|\.git|\.pocket-ai-install|\.env)(/|$)|\.rayext$' }).Count) {

@@ -13,6 +13,7 @@ Ask questions, look up words, translate, and polish writing without opening anot
 - **One input bar:** type your query in Raycast, not a separate form.
 - **Streaming conversations:** responses arrive progressively; follow-ups retain context.
 - **Bring your own provider:** configure a base URL and optional API key. A VS Code Copilot bridge can be used if you already have one.
+- **Remote harnesses:** optionally use Ask AI as a streaming frontend for your own Hermes or OpenClaw agent, with server-owned sessions, tool activity, approvals, and cancellation.
 - **Model dropdown:** discover and select the models your provider exposes.
 - **Ready-made commands:** Ask AI, Dictionary, Translator, and Polish Text.
 - **Your own commands:** create from templates; customize prompts, placeholders, models, and endpoint overrides.
@@ -50,7 +51,7 @@ The installer checks prerequisites, installs locked dependencies, requests sourc
 ```json
 {
   "status": "installed",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "commands": 8,
   "watcherRunning": false,
   "uiVerification": "required"
@@ -120,6 +121,12 @@ The default endpoint is `http://127.0.0.1:23333/api/openai/v1`. It expects a sep
 
 No bridge implementation, GitHub Copilot credentials, or provider access is bundled with Pocket AI. Different-origin command endpoint overrides never receive the default provider's API key.
 
+## Connect a remote agent
+
+In **Pocket AI Settings > Remote Agents**, choose **Hermes Agent** or **OpenClaw Agent** as the **Ask AI Backend**, then enter its separate URL and password-type credential. Reopen Ask AI and choose an advertised agent from the dropdown. **Direct Model remains the default**; other tools continue using the direct provider.
+
+See [REMOTE-AGENTS.md](REMOTE-AGENTS.md) for SSH/private ingress, server setup, OpenClaw pairing, session recovery, tool approvals, and precise supported protocol/verification boundaries. Tools execute on the agent's machine; web access depends on its configured harness tools.
+
 ## Commands and shortcuts
 
 Aliases and hotkeys are suggestions, not installed or overwritten automatically:
@@ -144,12 +151,12 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 ## Settings and current limits
 
 - Command management is in the **Pocket AI Settings command**, not embedded in Raycast's native preferences page.
-- Native preferences contain the provider URL/key. Raycast does not expose arbitrary Add/Delete controls there.
+- Native preferences contain direct-provider URL/key and the optional Ask AI backend/remote credentials. Raycast does not expose arbitrary Add/Delete controls there.
 - Deleting a built-in disables it in Pocket AI; restore it with its previous settings from the dashboard.
 - Raycast owns static command rows and Quicklinks. Disable/remove their shortcut entries separately if you no longer want them listed.
 - Custom placeholders apply inside an open command. Root-search argument hints come from the static manifest.
 - The SDK does not expose mouse-wheel scroll events. Select an older response row to pause following, or press Ctrl+L before wheel-only browsing.
-- Conversations live in memory for the current invocation and are sent to your configured provider. Your provider's own data-handling terms still apply.
+- Direct-model conversations live in invocation memory. Remote-agent transcripts live on your harness; Pocket AI remembers scoped session/run identifiers and encrypted OpenClaw device material, not a local conversation archive. Your provider/harness data-handling terms still apply.
 - Installation packages do not contain your custom commands, saved preferences, aliases, hotkeys, keys, or chat history.
 - The internal extension ID remains `mae-ai` for compatibility with existing shortcuts and storage; the user-facing name is Pocket AI.
 

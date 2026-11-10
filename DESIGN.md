@@ -1,6 +1,6 @@
 # Pocket AI: current design specification
 
-- **Status:** implemented baseline for Pocket AI 1.0.0
+- **Status:** implemented baseline for Pocket AI 1.1.0
 - **Updated:** November 10, 2026
 - **Scope:** product behavior, interaction design, architecture, persistence, and installation.
 
@@ -27,7 +27,7 @@ The user-facing product name is **Pocket AI**. The manifest name `mae-ai`, exist
 - Do not install a provider, manage its subscription, or automate account sign-in.
 - Do not require a separate text-entry form for queries or follow-ups.
 - Do not claim that extension code can add arbitrary controls to Raycast's native preferences.
-- Do not persist chat history, synchronize user settings between machines, or automatically manage host-owned aliases and Quicklinks.
+- Do not maintain a local chat archive, synchronize user settings between machines, or automatically manage host-owned aliases and Quicklinks. Remote harnesses own their transcripts; Pocket AI persists scoped session/run identifiers and encrypted OpenClaw device material.
 - Windows is the verified installation platform. Although the manifest declares macOS compatibility, the Windows installer and desktop verification do not establish macOS support.
 
 ## 2. Commands and entry points
@@ -65,6 +65,8 @@ Source: [`package.json`](package.json), [`src/custom-tool.tsx`](src/custom-tool.
 - Display the model dropdown in the search bar accessory.
 
 ### Requests and conversation state
+
+This subsection describes **Direct Model** mode. Ask AI's optional remote-agent mode uses server-owned history and execution, described below.
 
 A turn contains a monotonically increasing invocation-local ID, query, accumulated answer, model ID, status, and optional error. Status is one of `streaming`, `complete`, `stopped`, or `error`.
 
@@ -204,6 +206,33 @@ Surface request errors without discarding already received text. Provide actiona
 
 Source: [`src/lib/stream.ts`](src/lib/stream.ts), [`src/lib/models.ts`](src/lib/models.ts), [`src/hooks/use-models.ts`](src/hooks/use-models.ts).
 
+### Optional remote-agent backend for Ask AI
+
+**Direct Model** remains the default. Only the built-in `ask-ai` ID honors the native **Ask AI Backend** preference (`direct`, `hermes`, `openclaw`). Deleted-command checks happen before routing. Dictionary, Translator, Polish, and custom/template commands retain their existing direct-model transport.
+
+The dashboard adds a **Remote Agents** settings entry. Native preferences contain separate Hermes URL/key and OpenClaw Gateway URL/token-password fields. No agent inherits `apiKey`, per-tool endpoint overrides, or direct-provider model selections. URLs reject embedded credentials/query/fragment and preserve proxy/profile prefixes. Hermes accepts HTTP(S); OpenClaw normalizes HTTP(S) to WS(S).
+
+Remote mode retains the controlled top-bar query/follow-up input, tool prompt/placeholders, streamed answer rows, formatted conversation/copy, and follow-latest policy. Text rendering is batched around 40 ms and following around 120 ms. It shows a bounded six recent activity entries and explicit approval review rows. Only one active/unconfirmed run is writable at a time; follow-ups wait for settlement rather than accidentally starting parallel tasks.
+
+The dropdown discovers **agent targets**, not raw LLMs. Hermes uses `/v1/models` for the configured profile and does not send its virtual profile ID as a native underlying model override. OpenClaw uses `agents.list`. The harness controls its model, tools, web access, memory, and remote environment.
+
+| Backend  | Implemented protocol                                                                                                                                                                                                                                                                                                                     |
+| -------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Hermes   | `/v1/capabilities` feature checks, session create/history, `/v1/runs` submission with idempotency key and server-owned session ID, status polling, SSE with sequence deduplication/Last-Event-ID reconnect, tool/delegation activity, exact generation-bound one-time approval/deny, cooperative stop.                                   |
+| OpenClaw | Official client/protocol packages pinned together at 2026.8.1; native wire protocol 4; challenge-signed Ed25519 device pairing; agent discovery, isolated session creation, chat send/history/abort, exact session subscriptions and sanitized approval replay/events, generic one-time approval/deny, reconnect/history reconciliation. |
+
+OpenClaw requests only `operator.read`, `operator.write`, and `operator.approvals`; it does not use a privileged backend bypass, disable pairing/TLS, or silently authorize devices. Pairing is reviewed on the server. Hermes receives custom prompts in `instructions`; OpenClaw receives explicitly labeled response instructions in user-message context because the native chat RPC does not expose a system-prompt override.
+
+Persist submission identity **before** dispatch and run identity after acknowledgment. Do not automatically replay accepted or unconfirmed work after a timeout/disconnect. Hermes `unknown` is not terminal success. An uncertain acknowledgment blocks follow-ups until reconciled or the user explicitly starts a separate conversation after reviewing the server. Never mark a cooperative stop complete merely because the stop endpoint acknowledged it.
+
+Closing the UI detaches without cancelling remote work. Reopening Ask AI restores its last scoped session, reads up to 100 recent server-owned messages, and resumes known work. OpenClaw reconnects recreate subscriptions and authoritative history, adopt exact in-flight run IDs including empty-text runs, discard duplicate event sequences, and reject replaced physical sessions. Transport gaps trigger reconciliation, not resubmission. New Conversation forgets the local pointer, not the server transcript.
+
+Credential/backend/normalized URL changes isolate session and device storage via a SHA-256 scope; selected agents have separate session pointers. Shared credentials stay in native password preferences. OpenClaw identity/device tokens are AES-256-GCM encrypted with an scrypt-derived key and random salt before LocalStorage writes. No transcript or prompt is stored locally.
+
+Remote tools run on the agent machine. There is no file upload/device bridge, local tool execution, automatic web-search tool injection, attachment support, or harness installation. Hermes API sessions cannot attach to foreign CLI/Discord-owned sessions. Hermes clarification/secret/native prompts and OpenClaw question workflows remain on their native surface. Permanent approval grants are not offered.
+
+Full setup, pairing, supported versions, tunnel examples, and limitations: [REMOTE-AGENTS.md](REMOTE-AGENTS.md). Source: [`src/components/remote-agent-view.tsx`](src/components/remote-agent-view.tsx), [`src/lib/agents`](src/lib/agents), [`tests/agents.test.ts`](tests/agents.test.ts).
+
 ## 6. Persistence and privacy
 
 The saved tool shape is:
@@ -222,15 +251,18 @@ interface Tool {
 }
 ```
 
-| Data                   | Storage and lifetime                                                                        |
-| ---------------------- | ------------------------------------------------------------------------------------------- |
-| Endpoint and API key   | Native Raycast extension preferences; the key uses a password-type preference.              |
-| Command registry       | Raycast LocalStorage key `pocket-ai.commands.v2`, containing `tools` and `deletedBuiltIns`. |
-| Migration inputs       | Fall back to `pocket-ai.tools.v1`, then `mae-ai.tools.v1`, when no current registry exists. |
-| Remembered model       | LocalStorage key `pocket-ai.model:<provider-base-url>:<tool-id>`.                           |
-| Conversation turns     | React state for the current invocation only.                                                |
-| Aliases and Quicklinks | Raycast-owned settings, outside the tool registry.                                          |
-| Installer cache/logs   | `.pocket-ai-install` within the source folder; excluded from distribution.                  |
+| Data                      | Storage and lifetime                                                                                                         |
+| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| Endpoint and API key      | Native Raycast extension preferences; the key uses a password-type preference.                                               |
+| Command registry          | Raycast LocalStorage key `pocket-ai.commands.v2`, containing `tools` and `deletedBuiltIns`.                                  |
+| Migration inputs          | Fall back to `pocket-ai.tools.v1`, then `mae-ai.tools.v1`, when no current registry exists.                                  |
+| Remembered model          | LocalStorage key `pocket-ai.model:<provider-base-url>:<tool-id>`.                                                            |
+| Direct conversation turns | React state for the current invocation only.                                                                                 |
+| Remote session pointers   | `pocket-ai.agent-session.v1:<scope>:<agent>`: session, run, pending-submission identifiers; no prompt/transcript.            |
+| Remote agent selection    | `pocket-ai.agent-target.v1:<scope>`.                                                                                         |
+| OpenClaw device material  | `pocket-ai.agent-device.v1:<scope>`: authenticated-encrypted identity/device tokens, protected by native gateway credential. |
+| Aliases and Quicklinks    | Raycast-owned settings, outside the tool registry.                                                                           |
+| Installer cache/logs      | `.pocket-ai-install` within the source folder; excluded from distribution.                                                   |
 
 Built-in defaults merge with saved overrides by ID before deletion filtering. Saving a tool clears its tombstone; saving another tool must not resurrect deleted built-ins.
 
@@ -248,6 +280,10 @@ Raycast root search / alias / hotkey / Quicklink
         -> useModels -> model discovery + remembered selection
         -> conversationMessages -> streamCompletion -> external provider
         -> responseRows + FollowLatestPolicy -> Raycast List
+     -> RemoteAgentView (ask-ai only, when selected)
+        -> HermesAdapter -> HTTP runs + SSE + session history/controls
+        -> OpenClawAdapter -> official GatewayClient -> native WebSocket RPC/events
+        -> scoped session receipts + encrypted device vault
 
 Pocket AI Settings -> ToolEditor -> tool registry
                    -> native extension preferences
@@ -302,6 +338,10 @@ Source: [`install.ps1`](install.ps1), [`scripts/install-functions.ps1`](scripts/
 
 Automated coverage is in [`tests`](tests): streaming and provider errors, model discovery, session construction, templates/language, registry deletion/restoration, row wrapping, scrolling policy, and PowerShell installer guards/build validation.
 
-As of this baseline, the 26 Node tests and 15 installer checks passed. A fresh public GitHub clone passed dependency restoration, checks, and an isolated build. The actual published v1.0.0 release ZIP was separately downloaded without GitHub authentication, checksum-verified, and installed with the normal installer; the dashboard, streaming response, contextual follow-up, and absence of a developer PID file were verified in the Windows desktop UI.
+The original 1.0 baseline passed 26 Node tests and 15 installer checks. A fresh public GitHub clone passed dependency restoration, checks, and an isolated build. The actual published v1.0.0 release ZIP was separately downloaded without GitHub authentication, checksum-verified, and installed with the normal installer; the dashboard, streaming response, contextual follow-up, and absence of a developer PID file were verified in the Windows desktop UI.
+
+The 1.1 baseline passed 35 Node tests and 15 installer checks, plus typecheck, lint, formatting, and the production build. Agent checks use local HTTP/SSE and WebSocket mock servers for authenticated requests, signed pairing, agent/session discovery, partial output, exact approval identity, cancellation, reconnection without duplicate dispatch, foreign-session isolation, unknown execution, and authenticated device encryption.
+
+The installed Windows Raycast UI was checked against a temporary loopback Hermes mock: agent dropdown, multiple partial streaming states, tool activity, completed reply, same-session follow-up, and history restoration after reopening. New Conversation cleared that test session pointer. The mock was stopped and Ask AI restored to Direct Model, with the original provider's model dropdown visible. No user-owned remote Hermes/OpenClaw endpoint or credential was available, so these checks do not establish live cloud-server compatibility.
 
 Those desktop checks used an existing signed-in Raycast installation, Node runtime, and configured provider. A clean second Windows machine and macOS have not been verified. This is a verification record, not a claim that CI or every platform has passed.

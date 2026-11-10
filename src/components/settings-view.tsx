@@ -85,6 +85,29 @@ export default function SettingsView({
           }
         />
         <List.Item
+          id="remote-agent-settings"
+          title="Remote Agents"
+          subtitle="Ask AI backend, Hermes, and OpenClaw"
+          icon={Icon.Network}
+          keywords={[
+            "agent",
+            "hermes",
+            "openclaw",
+            "harness",
+            "server",
+            "backend",
+          ]}
+          actions={
+            <ActionPanel>
+              <Action
+                title="Configure Remote Agents"
+                icon={Icon.Gear}
+                onAction={openExtensionPreferences}
+              />
+            </ActionPanel>
+          }
+        />
+        <List.Item
           id="provider-settings"
           title="AI Provider"
           subtitle="API endpoint and key"

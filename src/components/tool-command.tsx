@@ -33,6 +33,8 @@ import {
 } from "../lib/tools";
 import SettingsView from "./settings-view";
 import ToolEditor, { languages } from "./tool-editor";
+import RemoteAgentView from "./remote-agent-view";
+import { normalizeAgentUrl } from "../lib/agents/types";
 
 interface Request {
   id: number;
@@ -713,6 +715,48 @@ export default function ToolCommand({
     );
   if (!tool)
     return <List isLoading searchBarPlaceholder="Loading Pocket AI..." />;
+  const preferences = getPreferenceValues<Preferences>();
+  const backend = preferences.askBackend || "direct";
+  if (id === "ask-ai" && backend !== "direct") {
+    try {
+      return (
+        <RemoteAgentView
+          tool={tool}
+          initialQuery={initialQuery}
+          backend={backend}
+          url={normalizeAgentUrl(
+            backend,
+            backend === "hermes"
+              ? preferences.hermesUrl || "http://127.0.0.1:8642"
+              : preferences.openclawUrl || "ws://127.0.0.1:18789",
+          )}
+          secret={
+            backend === "hermes"
+              ? preferences.hermesKey || ""
+              : preferences.openclawToken || ""
+          }
+        />
+      );
+    } catch (failure) {
+      return (
+        <List
+          actions={
+            <ActionPanel>
+              <Action
+                title="Configure Remote Agents"
+                onAction={openExtensionPreferences}
+              />
+            </ActionPanel>
+          }
+        >
+          <List.EmptyView
+            title="Invalid Agent URL"
+            description={String(failure)}
+          />
+        </List>
+      );
+    }
+  }
   return (
     <QueryView
       tool={tool}
