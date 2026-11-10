@@ -1,0 +1,348 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Pocket AI - Open-source Raycast AI alternative for Mac and Windows
+    </title>
+    <meta
+      name="description"
+      content="Bring your own models to Raycast, without Raycast Pro. Stream AI chat, translate, define words, polish writing, or connect Hermes and OpenClaw agents on macOS and Windows."
+    />
+    <meta name="robots" content="index,follow" />
+    <link
+      rel="canonical"
+      href="https://edliuustc.github.io/pocket-ai-raycast/"
+    />
+    <meta property="og:type" content="website" />
+    <meta
+      property="og:title"
+      content="Pocket AI - Your models. Your agents. Inside Raycast."
+    />
+    <meta
+      property="og:description"
+      content="An open-source Raycast AI alternative for macOS and Windows. Bring your own provider or connect Hermes and OpenClaw. No Raycast Pro required."
+    />
+    <meta
+      property="og:url"
+      content="https://edliuustc.github.io/pocket-ai-raycast/"
+    />
+    <meta
+      property="og:image"
+      content="https://edliuustc.github.io/pocket-ai-raycast/assets/social-preview.png"
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <link rel="icon" href="assets/pocket-ai-native.png" />
+    <link rel="stylesheet" href="site.css" />
+    <script src="demo.js" defer></script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "SoftwareApplication",
+        "name": "Pocket AI for Raycast",
+        "applicationCategory": "ProductivityApplication",
+        "operatingSystem": "macOS, Windows",
+        "softwareVersion": "1.3.0",
+        "description": "Open-source Raycast AI alternative using your own models or Hermes/OpenClaw agents.",
+        "url": "https://edliuustc.github.io/pocket-ai-raycast/",
+        "license": "https://opensource.org/license/mit",
+        "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+      }
+    </script>
+  </head>
+  <body>
+    <header class="nav wrap">
+      <a class="brand" href="./"
+        ><img
+          src="assets/pocket-ai-native.png"
+          alt=""
+          width="36"
+          height="36"
+        />Pocket AI</a
+      >
+      <nav aria-label="Main navigation">
+        <a href="#demo">Demo</a>
+        <a href="guides.html">Guides</a>
+        <a href="https://github.com/edliuustc/pocket-ai-raycast">GitHub</a>
+      </nav>
+    </header>
+    <main>
+      <section class="hero wrap">
+        <p class="eyebrow">
+          <span class="dot"></span> Open source &middot; macOS + Windows
+        </p>
+        <h1>
+          Your models.<br />Your agents.<br /><span>Inside Raycast.</span>
+        </h1>
+        <p class="lead">
+          An open-source <strong>Raycast AI alternative</strong> that brings
+          streaming chat, translation, dictionary lookups, and writing tools to
+          the input bar you already use.
+        </p>
+        <div class="buttons">
+          <a
+            class="button primary"
+            href="https://github.com/edliuustc/pocket-ai-raycast/blob/main/INSTALL-MACOS.md"
+            >Install on Mac <span aria-hidden="true">&rarr;</span></a
+          >
+          <a
+            class="button"
+            href="https://github.com/edliuustc/pocket-ai-raycast#install-on-windows"
+            >Install on Windows</a
+          >
+        </div>
+        <p class="fine">
+          No Raycast Pro required. Bring your own provider.<br />The extension
+          is free; provider usage, subscriptions, and remote hosting are
+          separate.
+        </p>
+        <div class="pills">
+          <span>OpenAI-compatible APIs</span><span>Hermes</span
+          ><span>OpenClaw</span><span>MIT licensed</span>
+        </div>
+      </section>
+      <section class="demo-section wrap" id="demo">
+        <div class="section-top">
+          <div>
+            <p class="eyebrow">See the workflow</p>
+            <h2>One input. More possibilities.</h2>
+          </div>
+          <p class="muted">
+            Scripted, interactive illustration.<br />No live model or API calls.
+          </p>
+        </div>
+        <div class="scenes" role="group" aria-label="Choose a sample workflow">
+          <button type="button" data-scene="chat" aria-pressed="true">
+            Ask AI
+          </button>
+          <button type="button" data-scene="dictionary" aria-pressed="false">
+            Dictionary
+          </button>
+          <button type="button" data-scene="translator" aria-pressed="false">
+            Translator
+          </button>
+          <button type="button" data-scene="agents" aria-pressed="false">
+            Remote agents
+          </button>
+        </div>
+        <div
+          class="demo-window"
+          id="demo-window"
+          aria-label="Illustrated Pocket AI walkthrough, not a native Raycast screenshot"
+        >
+          <div class="demo-title">
+            <span
+              ><img
+                src="assets/pocket-ai-native.png"
+                alt=""
+                width="22"
+                height="22"
+              />Pocket AI <span id="tool-title">/ Ask AI</span></span
+            ><span class="demo-badge">ILLUSTRATED DEMO</span>
+          </div>
+          <div class="demo-search">
+            <label class="sr-only" for="demo-query">Sample query</label
+            ><input
+              id="demo-query"
+              readonly
+              value="Explain an API in one sentence."
+            /><label class="sr-only" for="demo-backend">Preview backend</label
+            ><select id="demo-backend">
+              <option value="direct">Direct Model</option>
+              <option value="hermes">Hermes</option>
+              <option value="openclaw">OpenClaw</option>
+            </select>
+          </div>
+          <div class="demo-body">
+            <aside>
+              <div class="row-label">YOU</div>
+              <div class="question" id="question">
+                Explain an API in one sentence.
+              </div>
+              <div class="row-label">POCKET AI</div>
+              <div class="response-row">
+                <span class="dot"></span>Response
+                <span id="stream-status">Streaming</span>
+              </div>
+              <div class="model-note" id="model-note">
+                Model: your chosen model
+              </div>
+            </aside>
+            <article
+              id="demo-answer"
+              aria-label="Scripted sample response"
+            ></article>
+          </div>
+          <div class="demo-footer">
+            <span>Follow up in the same input bar</span
+            ><span>Switch AI Backend <kbd>&#8984; &#8679; B</kbd></span>
+          </div>
+        </div>
+        <p class="fine">
+          This illustration explains the workflow. The actual extension uses
+          Raycast's native interface. Backend switching lives in its Actions
+          menu; Direct mode uses the top-bar model dropdown.
+        </p>
+        <details class="native-preview">
+          <summary>See the actual Raycast interface</summary>
+          <figure>
+            <img
+              src="assets/native-dictionary.png"
+              alt="Pocket AI Dictionary in native Raycast on Windows, showing a formatted definition of hello and a model dropdown"
+              width="1500"
+              height="950"
+              loading="lazy"
+            />
+            <figcaption>
+              Genuine Windows Raycast capture with the sample query "hello".
+              macOS uses Raycast's own native appearance.
+            </figcaption>
+          </figure>
+        </details>
+      </section>
+      <section class="features wrap" aria-label="Features">
+        <article class="card">
+          <span class="card-number">01</span>
+          <h3>Bring your own model</h3>
+          <p>
+            Connect an OpenAI-compatible endpoint, discover its models, and
+            choose from a dropdown. Use a Copilot-backed bridge if you already
+            have one configured.
+          </p>
+        </article>
+        <article class="card">
+          <span class="card-number">02</span>
+          <h3>Put your agent within reach</h3>
+          <p>
+            Use Raycast as a frontend for your Hermes or OpenClaw harness.
+            Sessions, tools, web access, and execution stay on your agent
+            server.
+          </p>
+        </article>
+        <article class="card">
+          <span class="card-number">03</span>
+          <h3>Make commands your own</h3>
+          <p>
+            Customize prompts, placeholders, target languages, and shortcuts.
+            Keep asking follow-up questions without opening another app.
+          </p>
+        </article>
+      </section>
+      <section class="install wrap" id="install">
+        <div>
+          <p class="eyebrow">Get started</p>
+          <h2>Your provider.<br />Three clear steps.</h2>
+          <p class="muted">
+            Source installation is available now.<br />You need Raycast and
+            Node.js 22.22.2 or newer.
+          </p>
+        </div>
+        <ol>
+          <li>
+            <strong>Install Pocket AI</strong>
+            <p>
+              Follow the
+              <a
+                href="https://github.com/edliuustc/pocket-ai-raycast/blob/main/INSTALL-MACOS.md"
+                >Mac guide</a
+              >
+              or
+              <a
+                href="https://github.com/edliuustc/pocket-ai-raycast#install-on-windows"
+                >Windows installer guide</a
+              >. Source installs are updated manually.
+            </p>
+          </li>
+          <li>
+            <strong>Connect a model or agent</strong>
+            <p>
+              Set your provider endpoint and optional key, or configure a
+              Hermes/OpenClaw server in Remote Agents.
+            </p>
+          </li>
+          <li>
+            <strong>Ask, refine, repeat</strong>
+            <p>
+              Launch Ask AI, Dictionary, Translator, or Polish. Assign your own
+              aliases and hotkeys in Raycast.
+            </p>
+          </li>
+        </ol>
+      </section>
+      <section class="faq wrap" id="faq">
+        <p class="eyebrow">Good to know</p>
+        <h2>Not another locked-in assistant.</h2>
+        <details>
+          <summary>Is this a free Raycast AI alternative?</summary>
+          <p>
+            Pocket AI is a free, MIT-licensed extension and does not use
+            Raycast's paid AI API. It does not unlock Raycast Pro features. You
+            supply an accessible model provider or remote agent; their usage
+            charges and terms still apply.
+          </p>
+        </details>
+        <details>
+          <summary>Does it work on Mac and Windows?</summary>
+          <p>
+            Yes. The project owner has verified the macOS Raycast V1 workflow,
+            including in-tool backend switching. Windows installation and
+            earlier native UI workflows have also been exercised. See the
+            installation guides for exact requirements.
+          </p>
+        </details>
+        <details>
+          <summary>Can it browse the web?</summary>
+          <p>
+            Direct mode sends chat requests to your provider; Pocket AI does not
+            add browsing there. Hermes/OpenClaw can use the tools enabled on
+            your own harness. Raycast is the frontend, not the executor.
+          </p>
+        </details>
+        <details>
+          <summary>What happens when I switch backends?</summary>
+          <p>
+            Unsent input stays as a draft, without being sent automatically.
+            Contexts are separate. Direct starts fresh on return; remote
+            sessions restore from their server and accepted remote work
+            continues when you switch away.
+          </p>
+        </details>
+        <details>
+          <summary>Where do my keys and conversations go?</summary>
+          <p>
+            Keys stay in Raycast's native password preferences. Direct
+            conversations live in invocation memory; remote transcripts live on
+            your harness. Requests go to the provider or server you configure.
+            Pocket AI does not add an analytics service.
+          </p>
+        </details>
+        <details>
+          <summary>Is this an official Raycast product?</summary>
+          <p>
+            No. Pocket AI is an independent open-source extension. Raycast and
+            other product names belong to their respective owners. Raycast Pro
+            and provider access are not included.
+          </p>
+        </details>
+      </section>
+      <section class="cta wrap">
+        <h2>Keep your workflow.<br /><span>Choose your intelligence.</span></h2>
+        <div class="buttons">
+          <a
+            class="button primary"
+            href="https://github.com/edliuustc/pocket-ai-raycast"
+            >Get Pocket AI on GitHub &rarr;</a
+          ><a class="button" href="guides.html">Read the setup guides</a>
+        </div>
+      </section>
+    </main>
+    <footer class="wrap">
+      <a class="brand" href="./">Pocket AI</a>
+      <p>Independent. Open source. Bring your own provider.</p>
+      <a href="https://github.com/edliuustc/pocket-ai-raycast/blob/main/LICENSE"
+        >MIT License</a
+      >
+    </footer>
+  </body>
+</html>

@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>
+      Use your own AI models, Hermes, and OpenClaw in Raycast - Pocket AI guides
+    </title>
+    <meta
+      name="description"
+      content="Set up Pocket AI on macOS or Windows: use an OpenAI-compatible provider in Raycast without Raycast Pro, connect Hermes or OpenClaw, and create custom AI shortcuts."
+    />
+    <link
+      rel="canonical"
+      href="https://edliuustc.github.io/pocket-ai-raycast/guides.html"
+    />
+    <link rel="icon" href="assets/pocket-ai-native.png" />
+    <link rel="stylesheet" href="site.css" />
+  </head>
+  <body>
+    <header class="nav wrap">
+      <a class="brand" href="./"
+        ><img
+          src="assets/pocket-ai-native.png"
+          alt=""
+          width="36"
+          height="36"
+        />Pocket AI</a
+      >
+      <nav aria-label="Main navigation">
+        <a href="./">Home</a
+        ><a href="https://github.com/edliuustc/pocket-ai-raycast">GitHub</a>
+      </nav>
+    </header>
+    <main class="guide wrap">
+      <p class="eyebrow">Practical setup guides</p>
+      <h1>Your AI, in Raycast.</h1>
+      <p class="lead">
+        Pocket AI is an independent, open-source Raycast AI alternative. The
+        extension is free; your provider's access requirements and costs still
+        apply.
+      </p>
+      <nav aria-label="Guide topics">
+        <a href="#own-models">Your own models</a
+        ><a href="#agents">Remote agents</a
+        ><a href="#shortcuts">AI shortcuts</a>
+      </nav>
+      <section id="own-models">
+        <h2>Use your own AI models in Raycast without Pro</h2>
+        <ol>
+          <li>
+            Install Raycast and Node.js 22.22.2+, then follow the
+            <a
+              href="https://github.com/edliuustc/pocket-ai-raycast/blob/main/INSTALL-MACOS.md"
+              >Mac source guide</a
+            >
+            or
+            <a
+              href="https://github.com/edliuustc/pocket-ai-raycast#install-on-windows"
+              >Windows installer guide</a
+            >.
+          </li>
+          <li>
+            Open <strong>Pocket AI Settings &gt; AI Provider</strong>. Enter
+            your OpenAI-compatible base URL, such as
+            <code>https://api.example.com/v1</code>, and its optional API key in
+            the native password field.
+          </li>
+          <li>
+            Open <strong>Ask AI</strong>. Choose
+            <strong>Direct Model</strong> from
+            <strong>Actions &gt; Switch AI Backend</strong>, then select an
+            advertised model from the top-bar dropdown.
+          </li>
+          <li>
+            Type in the top input bar and press Enter. Continue with follow-up
+            instructions in that same bar.
+          </li>
+        </ol>
+        <p>
+          A separately configured VS Code Copilot bridge can be used if you
+          already have one. Pocket AI does not include that bridge, grant
+          Copilot access, or bypass a provider subscription. A localhost URL
+          points to the machine running Raycast.
+        </p>
+      </section>
+      <section id="agents">
+        <h2>Use Hermes or OpenClaw from Raycast</h2>
+        <ol>
+          <li>
+            Run your own compatible Hermes API server or OpenClaw gateway. Make
+            it reachable through a trusted connection, such as a private
+            HTTPS/WSS ingress or your own loopback SSH tunnel.
+          </li>
+          <li>
+            Open <strong>Pocket AI Settings &gt; Remote Agents</strong>. Choose
+            the backend and enter its server URL; only that backend's fields
+            appear.
+          </li>
+          <li>
+            Use its credential action to set the corresponding native password
+            field. OpenClaw can also require device pairing on your gateway.
+          </li>
+          <li>
+            Save, reopen Ask AI, and choose an advertised agent/profile. Switch
+            backends from Actions or <strong>Command+Shift+B</strong> on Mac /
+            <strong>Ctrl+Shift+B</strong> on Windows.
+          </li>
+        </ol>
+        <p>
+          The harness owns models, web tools, memory, and execution. Leaving its
+          view does not cancel accepted work. No transcript is automatically
+          forwarded between backends, and an unsent draft is never automatically
+          submitted during a switch.
+        </p>
+        <a
+          class="button"
+          href="https://github.com/edliuustc/pocket-ai-raycast/blob/main/REMOTE-AGENTS.md"
+          >Read the full protocol and server guide &rarr;</a
+        >
+      </section>
+      <section id="shortcuts">
+        <h2>Create custom AI shortcuts in Raycast</h2>
+        <p>
+          Start with Ask AI, Dictionary, Translator, or Polish. Assign an alias
+          or hotkey in Raycast Settings. For example, assign
+          <strong>df</strong> to Dictionary, then enter <strong>df</strong>,
+          Space, a word, and Enter.
+        </p>
+        <p>
+          Use <strong>Customize This Tool</strong> to edit its prompt and
+          input/follow-up placeholders. Set an explicit target language for
+          Translator. For a new workflow, choose
+          <strong>Add New Command</strong>, save a template, and use
+          <strong>Add Command to Raycast</strong> to create a Quicklink with its
+          own shortcut.
+        </p>
+        <p>
+          Rich Markdown and image URLs appear in the native preview. Full-Width
+          Text provides automatic row following. Long rich previews use
+          Raycast's native/manual scrolling; Pocket AI does not control that
+          pane's internal scroll position.
+        </p>
+      </section>
+      <section>
+        <h2>Update a Mac source installation</h2>
+        <p>Close Pocket AI views, open Terminal in your checkout, then run:</p>
+        <pre><code>git pull --ff-only
+npm ci
+npm run build</code></pre>
+        <p>
+          Reopen Pocket AI. Source installations do not receive automatic Store
+          updates.
+        </p>
+      </section>
+      <a
+        class="button primary"
+        href="https://github.com/edliuustc/pocket-ai-raycast/issues"
+        >Report a problem on GitHub &rarr;</a
+      >
+    </main>
+    <footer class="wrap">
+      <a href="./">Pocket AI home</a>
+      <p>Independent project. No Raycast Pro or provider access included.</p>
+    </footer>
+  </body>
+</html>

@@ -5,7 +5,7 @@
 - Repository: `https://github.com/edliuustc/pocket-ai-raycast`.
 - User-facing product: Pocket AI.
 - Compatibility ID / npm name: `mae-ai`. Do not rename it or the existing command IDs.
-- Maintainer desktop verification: Windows. Mac Raycast V1 installation is user-reported; do not claim the maintainer verified the latest Mac UI.
+- Local desktop verification: Windows. The project owner reported Mac Raycast V1 verification through v1.3.0; do not present those reported checks as tests performed in this Windows environment.
 - macOS runtime portability is code-reviewed; use [INSTALL-MACOS.md](INSTALL-MACOS.md) for the Mac source workflow and desktop verification boundary.
 - License: MIT. Preserve `LICENSE`.
 

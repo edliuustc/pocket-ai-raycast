@@ -30,7 +30,7 @@ The user-facing product name is **Pocket AI**. The manifest name `mae-ai`, exist
 - Do not maintain a local chat archive, synchronize user settings between machines, or automatically manage host-owned aliases and Quicklinks. Remote harnesses own their transcripts; Pocket AI persists scoped session/run identifiers and encrypted OpenClaw device material.
 - Windows is the verified installation platform. Although the manifest declares macOS compatibility, the Windows installer and desktop verification do not establish macOS support.
 - The macOS source workflow is documented in [INSTALL-MACOS.md](INSTALL-MACOS.md). Runtime review found no Windows-only shell or filesystem dependency; custom shortcuts map to Command on Mac. This is code portability evidence, not a Mac desktop test.
-- A user reported successful installation on Mac Raycast V1. The maintainer has not directly verified that desktop or the latest rich-output/scrolling changes on Mac.
+- The project owner reported successful Mac Raycast V1 verification through v1.3.0, including the revised output, shared settings, and in-tool backend switching. These are reported Mac checks, not tests performed in the Windows development environment.
 
 ## 2. Commands and entry points
 
@@ -368,6 +368,8 @@ The 1.1 baseline passed 35 Node tests and 15 installer checks, plus typecheck, l
 
 The installed Windows Raycast UI was checked against a temporary loopback Hermes mock: agent dropdown, multiple partial streaming states, tool activity, completed reply, same-session follow-up, and history restoration after reopening. New Conversation cleared that test session pointer. The mock was stopped and Ask AI restored to Direct Model, with the original provider's model dropdown visible. No user-owned remote Hermes/OpenClaw endpoint or credential was available, so these checks do not establish live cloud-server compatibility.
 
-Those desktop checks used an existing signed-in Raycast installation, Node runtime, and configured provider. A clean second Windows machine and macOS have not been verified. This is a verification record, not a claim that CI or every platform has passed.
+Those desktop checks used an existing signed-in Raycast installation, Node runtime, and configured provider. A clean second Windows machine has not been verified. Mac checks were subsequently reported by the project owner, as noted below. This is a verification record, not a claim that CI or every platform has passed.
 
 The 1.2 Windows UI check exercised direct rich dictionary streaming, native Markdown rendering, switching to full-width text, following an overflowing 35-example follow-up to its final rows, switching back, and rendering an inline Markdown image from the extension's assets. Pure regressions cover native selection callback loops, non-starving throttle deadlines, valid replacement targets, rich message identity, and quiet successful agent status. These checks do not establish the revised UI on Mac Raycast V1 or imperative scrolling inside the rich pane.
+
+The project owner subsequently reported that the Mac Raycast V1 response targeting and settings fixes worked well, and explicitly verified the v1.3.0 in-tool backend switching. The v1.3.0 automated baseline passed 51 Node tests and 15 installer checks, plus typecheck, lint, formatting, and the persistent Windows build. The native Markdown pane's scrolling API limitation remains unchanged.

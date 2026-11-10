@@ -6,7 +6,7 @@ $root = Split-Path $PSScriptRoot
 . "$PSScriptRoot\install-functions.ps1"
 if (-not $OutputDirectory) { $OutputDirectory = Join-Path $root 'dist' }
 $names = @(
-    'src', 'assets', 'tests', 'scripts', '.github',
+    'src', 'assets', 'media', 'tests', 'scripts', '.github',
     'package.json', 'package-lock.json', 'tsconfig.json', 'eslint.config.js',
     '.gitignore', '.gitattributes', '.prettierignore', 'install.ps1', 'run.ps1',
     'README.md', 'AGENTS.md', 'DESIGN.md', 'REMOTE-AGENTS.md', 'INSTALL-MACOS.md', 'LICENSE', 'USAGE.txt', 'INSTALL-WINDOWS.txt'
@@ -23,7 +23,7 @@ Add-Type -AssemblyName System.IO.Compression.FileSystem
 $archive = [IO.Compression.ZipFile]::OpenRead($zip)
 try {
     $entries = @($archive.Entries | ForEach-Object { $_.FullName.Replace('\', '/') })
-    foreach ($required in @('install.ps1', 'scripts/install-functions.ps1', 'README.md', 'AGENTS.md', 'DESIGN.md', 'REMOTE-AGENTS.md', 'INSTALL-MACOS.md', 'LICENSE', 'src/components/tool-command.tsx', 'src/lib/agents/openclaw.ts', 'assets/pocket-ai-native.png')) {
+    foreach ($required in @('install.ps1', 'scripts/install-functions.ps1', 'README.md', 'AGENTS.md', 'DESIGN.md', 'REMOTE-AGENTS.md', 'INSTALL-MACOS.md', 'LICENSE', 'src/components/tool-command.tsx', 'src/lib/agents/openclaw.ts', 'assets/pocket-ai-native.png', 'media/native-dictionary.png', 'media/workflow-demo.gif')) {
         if ($required -notin $entries) { throw "The archive is incomplete: $required" }
     }
     if (@($entries | Where-Object { $_ -match '(^|/)(node_modules|\.git|\.pocket-ai-install|\.env)(/|$)|\.rayext$' }).Count) {

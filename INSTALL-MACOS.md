@@ -1,6 +1,6 @@
 # Install Pocket AI on macOS
 
-**Status:** a user has reported successful installation on **Raycast V1 for Mac**. The runtime has been reviewed for Windows-only assumptions. The maintainer has not directly verified a Mac desktop, and the latest rich-output/scrolling changes still need Mac verification.
+**Status:** the project owner reported successful verification on **Raycast V1 for Mac through v1.3.0**, including the revised output, settings synchronization, and in-tool backend switching. The runtime has also been reviewed for Windows-only assumptions. The Windows development environment did not perform that Mac desktop check.
 
 The plugin uses Raycast UI/storage APIs, standard Node.js cryptography, and HTTP/SSE/WebSocket connections. Its custom shortcuts include macOS mappings. No Windows executable or PowerShell command is required by the plugin itself. The bundled `install.ps1`, `run.ps1`, and installer tests are Windows-only; do not use them on a Mac.
 

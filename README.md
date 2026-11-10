@@ -2,11 +2,25 @@
 
 # Pocket AI for Raycast
 
-**Your own AI provider, with rich replies inside Raycast.**
+**An open-source Raycast AI alternative for macOS and Windows. No Raycast Pro required.**
 
 Ask questions, look up words, translate, and polish writing without opening another app. Replies stream beneath the input bar, and follow-up questions stay in the same conversation. Pocket AI uses your OpenAI-compatible provider, not Raycast's paid AI API.
 
+[**Install on Mac**](INSTALL-MACOS.md) · [**Install on Windows**](#install-on-windows) · [**Website & interactive demo**](https://edliuustc.github.io/pocket-ai-raycast/) · [**Setup guides**](https://edliuustc.github.io/pocket-ai-raycast/guides.html)
+
+The extension is free and MIT-licensed. **Provider usage, subscriptions, and remote hosting are separate.** Bring your own accessible models, or connect Ask AI to your own Hermes/OpenClaw agent. Pocket AI does not unlock Raycast Pro features.
+
 [![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)](LICENSE)
+
+## See it in action
+
+![Pocket AI Dictionary showing a formatted definition of hello in native Raycast on Windows](media/native-dictionary.png)
+
+_Genuine Windows Raycast capture using the sample query "hello". macOS uses Raycast's native appearance; the project owner verified the Mac Raycast V1 workflow through v1.3.0._
+
+![Illustrated walkthrough of chat, dictionary, translation, and remote-agent workflows](media/workflow-demo.gif)
+
+_30-second scripted website illustration, not a native Raycast recording. [Try the interactive demo](https://edliuustc.github.io/pocket-ai-raycast/#demo)._
 
 ## What it does
 
@@ -26,18 +40,18 @@ Ask questions, look up words, translate, and polish writing without opening anot
 
 ## Requirements
 
-| Requirement   | Details                                                                                                                                                                  |
-| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
-| Platform      | Windows is desktop-verified. Installation on Mac Raycast V1 is user-reported; the latest UI changes are not Mac-desktop-verified. See the [Mac guide](INSTALL-MACOS.md). |
-| Raycast       | Install, open, and sign in before installing Pocket AI. A free account is sufficient for this extension.                                                                 |
-| Node.js + npm | Stable Node.js **22.22.2 or newer** with npm; the Windows installer needs `npm.cmd` next to `node.exe`.                                                                  |
-| AI provider   | An accessible OpenAI-compatible API with chat completions and model discovery. Provider access or subscriptions are separate.                                            |
+| Requirement   | Details                                                                                                                                                                       |
+| ------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Platform      | Windows desktop workflows are verified. The project owner verified Mac Raycast V1 through v1.3.0, including in-tool backend switching. See the [Mac guide](INSTALL-MACOS.md). |
+| Raycast       | Install, open, and sign in before installing Pocket AI. A free account is sufficient for this extension.                                                                      |
+| Node.js + npm | Stable Node.js **22.22.2 or newer** with npm; the Windows installer needs `npm.cmd` next to `node.exe`.                                                                       |
+| AI provider   | An accessible OpenAI-compatible API with chat completions and model discovery. Provider access or subscriptions are separate.                                                 |
 
 Pocket AI does not install Raycast, install a provider, purchase subscriptions, or supply API credentials.
 
 ## Install on Mac
 
-Follow [INSTALL-MACOS.md](INSTALL-MACOS.md) for source import, production build, provider/agent setup, Mac shortcuts, updates, and verification. The plugin runtime has no Windows-only shell or filesystem dependency; macOS shortcuts are included. A user has reported successful installation on Raycast V1. The maintainer has not directly checked the latest rich-output/scrolling changes on a Mac. Do not run the Windows PowerShell installer on a Mac.
+Follow [INSTALL-MACOS.md](INSTALL-MACOS.md) for source import, production build, provider/agent setup, Mac shortcuts, updates, and verification. The plugin runtime has no Windows-only shell or filesystem dependency; macOS shortcuts are included. The project owner reported successful Mac Raycast V1 verification through v1.3.0. This Windows development environment was not used to perform that Mac check. Do not run the Windows PowerShell installer on a Mac.
 
 ## Install on Windows
 
@@ -166,7 +180,7 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 ## Settings and current limits
 
 - Command management is in the **Pocket AI Settings command**, not embedded in Raycast's native preferences page.
-- Native preferences contain direct-provider URL/key, remote password credentials, and legacy backend/URL fields. They cannot hide fields conditionally; use **Pocket AI Settings > Remote Agents** for the dynamic backend settings.
+- Native preferences contain the direct-provider URL/key, remote password credentials, and response-view choice. Use **Pocket AI Settings > Remote Agents** for the shared dynamic backend/server settings; there is no duplicate native backend selector.
 - Deleting a built-in disables it in Pocket AI; restore it with its previous settings from the dashboard.
 - Raycast owns static command rows and Quicklinks. Disable/remove their shortcut entries separately if you no longer want them listed.
 - Custom placeholders apply inside an open command. Root-search argument hints come from the static manifest.
@@ -187,6 +201,10 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 | HTTP 401/403                             | Check the API key and provider access.                                                                                |
 | HTTP 404                                 | Check the complete API path, including any prefix before `/v1`.                                                       |
 | Import timeout                           | Read logs in `.pocket-ai-install`; correct the cause and retry.                                                       |
+
+## Community
+
+[Share a workflow or ask a question in Discussions](https://github.com/edliuustc/pocket-ai-raycast/discussions). Use [Issues](https://github.com/edliuustc/pocket-ai-raycast/issues) for reproducible bugs and feature requests. Pocket AI is independent of Raycast, GitHub Copilot, Hermes, and OpenClaw.
 
 ## Development
 
