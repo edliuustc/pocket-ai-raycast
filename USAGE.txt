@@ -2,8 +2,9 @@ Pocket AI - your AI tools in Raycast
 
 MAC INSTALLATION
 See INSTALL-MACOS.md for source import, provider setup, Mac shortcuts,
-updates, and required desktop checks. macOS is declared and code-reviewed,
-but has not been desktop-verified. Do not run install.ps1 on a Mac.
+updates, and required desktop checks. Mac Raycast V1 installation is
+user-reported; the latest UI changes are not maintainer-verified on Mac.
+Do not run install.ps1 on a Mac.
 The Ctrl shortcuts below describe Windows; use the Mac guide for equivalents.
 
 QUICK START
@@ -13,14 +14,20 @@ Type an alias, press Space, enter your text, then press Enter:
   tr   Translate text
   pl   Polish text
 
-Replies stream below the top input bar. That bar clears automatically and
+Rich Markdown replies stream directly into the native preview. Actions >
+Use Full-Width Text switches to the original row-based stream; Show Rich
+Markdown switches back. Set your default in native Response View preferences.
+Markdown image URLs are supported, not binary attachments or a web canvas.
+That bar clears automatically and
 becomes the follow-up input. Type another instruction and press Enter to
 continue the same conversation. Previous questions and answers stay visible.
 New Conversation starts over; Regenerate Last Response retries without
 duplicating the last question. The model dropdown is at the top right.
 
-Long replies automatically follow the latest streamed line. Selecting an
-older transcript row pauses auto-scroll so you can read without being moved.
+Full-width text follows the latest streamed line. Rich mode follows messages;
+Raycast V1 does not expose control of scrolling inside the Markdown pane,
+so long rich replies use native/manual scrolling. Pause explicitly before
+browsing older transcript rows so you can read without being moved.
 Ctrl+L pauses auto-scroll, or jumps to the latest line and resumes it.
 Sending a new follow-up always resumes following the newest answer.
 Raycast does not expose wheel-scroll events to extensions: use Ctrl+L to

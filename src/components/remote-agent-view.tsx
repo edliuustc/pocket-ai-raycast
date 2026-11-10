@@ -3,6 +3,7 @@ import {
   ActionPanel,
   confirmAlert,
   Detail,
+  getPreferenceValues,
   Icon,
   Keyboard,
   List,
@@ -31,7 +32,9 @@ import {
   terminal,
 } from "../lib/agents/types";
 import { responseRows } from "../lib/response-rows";
-import { FollowLatestPolicy } from "../lib/scroll-policy";
+import { useFollowLatest } from "../hooks/use-follow-latest";
+import { agentPresentation } from "../lib/agent-presentation";
+import { Preferences } from "../lib/preferences";
 import { renderPrompt, Tool, toolPlaceholder } from "../lib/tools";
 import SettingsView from "./settings-view";
 import AgentSettingsView from "./agent-settings";
@@ -113,8 +116,9 @@ export default function RemoteAgentView({
   const [error, setError] = useState("");
   const [progress, setProgress] = useState<string[]>([]);
   const [approvals, setApprovals] = useState<AgentApproval[]>([]);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [following, setFollowing] = useState(true);
+  const [rich, setRich] = useState(
+    getPreferenceValues<Preferences>().responseView !== "plain",
+  );
   const adapter = useRef<AgentAdapter | undefined>(undefined);
   const session = useRef<AgentSession | undefined>(undefined);
   const watcher = useRef<AbortController | undefined>(undefined);
@@ -122,13 +126,22 @@ export default function RemoteAgentView({
   const mounted = useRef(true);
   const submissionLock = useRef(false);
   const autoSubmitted = useRef(false);
-  const policy = useRef(new FollowLatestPolicy());
   const generation = useRef(0);
   const busy =
     restoring ||
     state === "running" ||
     state === "stopping" ||
     state === "unknown";
+  const presentation = useMemo(
+    () => agentPresentation(messages, progress, approvals, state, error, rich),
+    [messages, progress, approvals, state, error, rich],
+  );
+  const follow = useFollowLatest(
+    presentation.latestId,
+    presentation.itemIds,
+    state === "running",
+  );
+  const { following } = follow;
   const sessionKey = useCallback(
     (agent: string) =>
       `pocket-ai.agent-session.v1:${scope}:${encodeURIComponent(agent)}`,
@@ -332,8 +345,7 @@ export default function RemoteAgentView({
     setError("");
     setProgress([]);
     setApprovals([]);
-    policy.current.resume();
-    setFollowing(true);
+    follow.resume();
     try {
       const instructions = renderPrompt(tool.prompt, tool.targetLanguage || "");
       const current = session.current || (await client.create(target));
@@ -453,33 +465,8 @@ export default function RemoteAgentView({
     setError("");
     setState("idle");
     setQuery("");
-    policy.current.resume();
-    setFollowing(true);
+    follow.reset();
   }
-
-  const rows = messages.flatMap((message, index) =>
-    responseRows(message.text).map((text, line) => ({
-      id: `message-${index}-${line}`,
-      text,
-      role: message.role,
-    })),
-  );
-  const latest = approvals.length
-    ? `approval-${approvals.at(-1)!.id}`
-    : error
-      ? "agent-error"
-      : rows.at(-1)?.id || "agent-state";
-  useEffect(() => {
-    if (!following || selectedItem === latest) return;
-    const timer = setTimeout(
-      () => {
-        policy.current.expectSelection(latest);
-        setSelectedItem(latest);
-      },
-      state === "running" ? 120 : 0,
-    );
-    return () => clearTimeout(timer);
-  }, [latest, following, selectedItem, state]);
 
   function actions() {
     return (
@@ -516,10 +503,14 @@ export default function RemoteAgentView({
             Windows: { modifiers: ["ctrl"], key: "l" },
             macOS: { modifiers: ["cmd"], key: "l" },
           }}
+          onAction={follow.toggle}
+        />
+        <Action
+          title={rich ? "Use Full-Width Text" : "Show Rich Markdown"}
+          icon={Icon.Document}
           onAction={() => {
-            if (following) policy.current.pause();
-            else policy.current.resume();
-            setFollowing(policy.current.following);
+            setRich((value) => !value);
+            follow.resume();
           }}
         />
         <Action.CopyToClipboard
@@ -571,11 +562,9 @@ export default function RemoteAgentView({
       searchText={query}
       onSearchTextChange={setQuery}
       searchBarPlaceholder={toolPlaceholder(tool, messages.length > 0)}
-      selectedItemId={selectedItem || undefined}
-      onSelectionChange={(id) => {
-        setSelectedItem(id);
-        setFollowing(policy.current.select(id, latest));
-      }}
+      selectedItemId={follow.selectedItemId}
+      onSelectionChange={follow.onSelectionChange}
+      isShowingDetail={rich && presentation.itemIds.length > 0}
       actions={actions()}
       searchBarAccessory={
         targets.length ? (
@@ -601,11 +590,36 @@ export default function RemoteAgentView({
         ) : undefined
       }
     >
-      {rows.map((row) => (
+      {!presentation.itemIds.length && (
+        <List.EmptyView
+          icon="pocket-ai-native.png"
+          title={tool.title}
+          description="Type in the top bar and press Enter. Follow-ups keep the same conversation."
+        />
+      )}
+      {presentation.rows.map((row) => (
         <List.Item
           key={row.id}
           id={row.id}
-          title={row.text}
+          title={
+            rich
+              ? row.role === "user"
+                ? responseRows(row.text)[0] || "Question"
+                : "Response"
+              : row.text
+          }
+          detail={
+            rich ? (
+              <List.Item.Detail
+                markdown={row.text}
+                isLoading={
+                  state === "running" &&
+                  row.id === presentation.rows.at(-1)?.id &&
+                  row.role === "assistant"
+                }
+              />
+            ) : undefined
+          }
           icon={row.role === "user" ? Icon.Person : undefined}
           actions={actions()}
         />
@@ -617,6 +631,7 @@ export default function RemoteAgentView({
               key={index}
               id={`progress-${index}`}
               title={text}
+              detail={rich ? <List.Item.Detail markdown={text} /> : undefined}
               icon={Icon.Terminal}
               actions={actions()}
             />
@@ -629,6 +644,13 @@ export default function RemoteAgentView({
           id={`approval-${approval.id}`}
           title={approval.title}
           subtitle="Review required"
+          detail={
+            rich ? (
+              <List.Item.Detail
+                markdown={`# ${approval.title}\n\n${approval.detail}`}
+              />
+            ) : undefined
+          }
           icon={Icon.ExclamationMark}
           actions={
             <ActionPanel>
@@ -642,23 +664,25 @@ export default function RemoteAgentView({
           }
         />
       ))}
-      <List.Item
-        id="agent-state"
-        title={
-          restoring
-            ? `Connecting to ${name}...`
-            : state === "idle" && !messages.length
-              ? `Ask ${name} anything`
-              : `Remote run: ${state}`
-        }
-        subtitle="Tools run on the agent's machine"
-        icon={Icon.Network}
-        actions={actions()}
-      />
+      {presentation.status && (
+        <List.Item
+          id="agent-state"
+          title={presentation.status}
+          detail={
+            rich ? (
+              <List.Item.Detail markdown={presentation.status} />
+            ) : undefined
+          }
+          subtitle="Tools run on the agent's machine"
+          icon={Icon.Network}
+          actions={actions()}
+        />
+      )}
       {error && (
         <List.Item
           id="agent-error"
           title={error}
+          detail={rich ? <List.Item.Detail markdown={error} /> : undefined}
           icon={Icon.ExclamationMark}
           actions={actions()}
         />

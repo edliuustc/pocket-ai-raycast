@@ -2,7 +2,7 @@
 
 # Pocket AI for Raycast
 
-**Your own AI provider, right below Raycast's search bar.**
+**Your own AI provider, with rich replies inside Raycast.**
 
 Ask questions, look up words, translate, and polish writing without opening another app. Replies stream beneath the input bar, and follow-up questions stay in the same conversation. Pocket AI uses your OpenAI-compatible provider, not Raycast's paid AI API.
 
@@ -11,30 +11,31 @@ Ask questions, look up words, translate, and polish writing without opening anot
 ## What it does
 
 - **One input bar:** type your query in Raycast, not a separate form.
+- **Rich output by default:** streamed Markdown and image URLs render directly in the native preview, without opening another view. Switch to full-width text from Actions.
 - **Streaming conversations:** responses arrive progressively; follow-ups retain context.
 - **Bring your own provider:** configure a base URL and optional API key. A VS Code Copilot bridge can be used if you already have one.
 - **Remote harnesses:** optionally use Ask AI as a streaming frontend for your own Hermes or OpenClaw agent, with server-owned sessions, tool activity, approvals, and cancellation.
 - **Model dropdown:** discover and select the models your provider exposes.
 - **Ready-made commands:** Ask AI, Dictionary, Translator, and Polish Text.
 - **Your own commands:** create from templates; customize prompts, placeholders, models, and endpoint overrides.
-- **Comfortable reading:** follow the latest streamed line, select older rows to pause, or use **Ctrl+L** (Windows) / **Command+L** (Mac) to pause/resume.
+- **Comfortable reading:** use **Ctrl+L** (Windows) / **Command+L** (Mac) to pause following before browsing older content, then resume when ready.
 - **Pocket AI Settings:** edit, add, delete, and restore built-in commands.
 - **Your shortcuts:** assign aliases and hotkeys; expose custom commands through Raycast Quicklinks.
 
 ## Requirements
 
-| Requirement   | Details                                                                                                                            |
-| ------------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| Platform      | Windows is desktop-verified. macOS is declared and code-reviewed, but not desktop-verified; see the [Mac guide](INSTALL-MACOS.md). |
-| Raycast       | Install, open, and sign in before installing Pocket AI. A free account is sufficient for this extension.                           |
-| Node.js + npm | Stable Node.js **22.22.2 or newer** with npm; the Windows installer needs `npm.cmd` next to `node.exe`.                            |
-| AI provider   | An accessible OpenAI-compatible API with chat completions and model discovery. Provider access or subscriptions are separate.      |
+| Requirement   | Details                                                                                                                                                                  |
+| ------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Platform      | Windows is desktop-verified. Installation on Mac Raycast V1 is user-reported; the latest UI changes are not Mac-desktop-verified. See the [Mac guide](INSTALL-MACOS.md). |
+| Raycast       | Install, open, and sign in before installing Pocket AI. A free account is sufficient for this extension.                                                                 |
+| Node.js + npm | Stable Node.js **22.22.2 or newer** with npm; the Windows installer needs `npm.cmd` next to `node.exe`.                                                                  |
+| AI provider   | An accessible OpenAI-compatible API with chat completions and model discovery. Provider access or subscriptions are separate.                                            |
 
 Pocket AI does not install Raycast, install a provider, purchase subscriptions, or supply API credentials.
 
 ## Install on Mac
 
-Follow [INSTALL-MACOS.md](INSTALL-MACOS.md) for source import, production build, provider/agent setup, Mac shortcuts, updates, and verification. The plugin runtime has no Windows-only shell or filesystem dependency; macOS shortcuts are included. Actual Mac import, UI behavior, and live streaming remain unverified. Do not run the Windows PowerShell installer on a Mac.
+Follow [INSTALL-MACOS.md](INSTALL-MACOS.md) for source import, production build, provider/agent setup, Mac shortcuts, updates, and verification. The plugin runtime has no Windows-only shell or filesystem dependency; macOS shortcuts are included. A user has reported successful installation on Raycast V1. The maintainer has not directly checked the latest rich-output/scrolling changes on a Mac. Do not run the Windows PowerShell installer on a Mac.
 
 ## Install on Windows
 
@@ -55,7 +56,7 @@ The installer checks prerequisites, installs locked dependencies, requests sourc
 ```json
 {
   "status": "installed",
-  "version": "1.1.1",
+  "version": "1.2.0",
   "commands": 8,
   "watcherRunning": false,
   "uiVerification": "required"
@@ -148,6 +149,14 @@ The top input clears after sending and becomes the follow-up input. **Ctrl+E** e
 
 Custom commands can be added to Raycast using **Add Command to Raycast**, then given their own Quicklink alias/hotkey.
 
+## Rich replies and scrolling
+
+The default **Rich Markdown** view keeps questions/follow-ups in the top bar and shows each selected message in Raycast's native Markdown preview. Headings, lists, emphasis, code blocks, links, and Markdown image URLs are preserved. Images must be reachable by Raycast; this does not add image generation or binary attachments.
+
+Use **Actions > Use Full-Width Text** for the original streaming transcript, or **Show Rich Markdown** to return. Set the default in native preferences under **Response View**. **Open Formatted Conversation** remains an optional full-conversation reader, not a requirement for formatted replies.
+
+Both views share a throttled follow-latest controller that ignores native selection callbacks while following, rather than bouncing between rows or mistaking typing/view redraws for history navigation. **Pause explicitly before browsing history**; resume or send a new question to follow again. Full-width text follows appended answer rows; rich mode selects the latest message without reselecting it on every token. **Raycast V1 does not expose a force-scroll API inside the Markdown pane**: long rich replies use native/manual scrolling. Use full-width text when automatic row-by-row following is required.
+
 ## Design specification
 
 See [DESIGN.md](DESIGN.md) for the current product and technical design: command flows, conversation and scrolling behavior, settings, templates, provider/model integration, storage, installation, acceptance criteria, and verified limitations.
@@ -159,7 +168,7 @@ See [DESIGN.md](DESIGN.md) for the current product and technical design: command
 - Deleting a built-in disables it in Pocket AI; restore it with its previous settings from the dashboard.
 - Raycast owns static command rows and Quicklinks. Disable/remove their shortcut entries separately if you no longer want them listed.
 - Custom placeholders apply inside an open command. Root-search argument hints come from the static manifest.
-- The SDK does not expose mouse-wheel scroll events. Select an older response row to pause following, or press Ctrl+L (Windows) / Command+L (Mac) before wheel-only browsing.
+- The SDK cannot distinguish selection callbacks caused by redraws from deliberate navigation, and exposes no mouse-wheel events. Press Ctrl+L (Windows) / Command+L (Mac), or use **Pause Auto-Scroll**, before browsing history. Native Markdown-pane scrolling is separate from transcript selection.
 - Direct-model conversations live in invocation memory. Remote-agent transcripts live on your harness; Pocket AI remembers scoped session/run identifiers and encrypted OpenClaw device material, not a local conversation archive. Your provider/harness data-handling terms still apply.
 - Installation packages do not contain your custom commands, saved preferences, aliases, hotkeys, keys, or chat history.
 - The internal extension ID remains `mae-ai` for compatibility with existing shortcuts and storage; the user-facing name is Pocket AI.

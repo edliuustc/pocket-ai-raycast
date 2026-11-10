@@ -5,7 +5,7 @@
 - Repository: `https://github.com/edliuustc/pocket-ai-raycast`.
 - User-facing product: Pocket AI.
 - Compatibility ID / npm name: `mae-ai`. Do not rename it or the existing command IDs.
-- Tested installation platform: Windows. Do not claim macOS installation is verified.
+- Maintainer desktop verification: Windows. Mac Raycast V1 installation is user-reported; do not claim the maintainer verified the latest Mac UI.
 - macOS runtime portability is code-reviewed; use [INSTALL-MACOS.md](INSTALL-MACOS.md) for the Mac source workflow and desktop verification boundary.
 - License: MIT. Preserve `LICENSE`.
 
@@ -90,13 +90,16 @@ On macOS, the corresponding Node checks use `npm` rather than `npm.cmd`. `npm te
 - `src\lib\storage.ts`: saved tool registry and migration. Preserve saved data and deleted built-in tombstones.
 - `src\lib\stream.ts`: OpenAI-compatible chat-completion streaming and provider errors. Do not use Raycast's paid AI API.
 - `src\lib\tools.ts`: templates and URL normalization; reject credentials in URLs.
-- `src\lib\scroll-policy.ts`: follow the latest row, ignore programmatic selection acknowledgements, pause on history navigation.
+- `src\lib\scroll-policy.ts`: explicit follow/pause lock, throttled targets, and guarded native acknowledgements. Do not infer pause intent from ambiguous selection callbacks.
+- `src\hooks\use-follow-latest.ts`: shared, throttled direct/remote selection controller. Native acknowledgements must not overwrite the current controlled target or endlessly postpone its timer.
 - `src\components\remote-agent-view.tsx` and `src\lib\agents`: Ask AI-only Hermes/OpenClaw sessions, streaming, approvals, stop/reconnect, and encrypted device material. Read [REMOTE-AGENTS.md](REMOTE-AGENTS.md) before configuring a server.
 - `scripts\install-functions.ps1`: Windows PowerShell 5.1-compatible installer helpers.
 
 Retain the model-dropdown initialization workaround: render the selected item first, set both `value` and `defaultValue`, and disable host storage. A different-origin endpoint override must never inherit the default API key.
 
 Keep the top search bar as the query/follow-up input. Do not regress to a separate form. Translator must require an explicit command-scoped target language.
+
+Rich output uses native `List.Item.Detail` with stable message IDs and unstripped Markdown, including image URLs. Preserve the full-width text option. Raycast V1 exposes no imperative scroll control inside the Markdown pane; never claim row-following tests establish rich-pane auto-scrolling. Keep errors/approvals/uncertain execution visible, but do not add routine connecting/completed agent rows.
 
 Direct Model stays the default. Never inherit its API key into an agent backend or automatically route dictionary/translation/polish/custom tools to remote agents. Remote work continues when the UI closes. Do not resubmit accepted/uncertain work, interpret Hermes `unknown` as completed, bypass OpenClaw device pairing, or request administrator scopes. Changing the endpoint, backend, credential, or selected agent must isolate session state.
 

@@ -1,6 +1,6 @@
 # Install Pocket AI on macOS
 
-**Status:** the extension declares macOS support, and its runtime has been checked for Windows-only assumptions. An actual macOS installation, Raycast UI, and live provider response have **not** been verified. This is a source-installation guide, not a claim of tested Mac support.
+**Status:** a user has reported successful installation on **Raycast V1 for Mac**. The runtime has been reviewed for Windows-only assumptions. The maintainer has not directly verified a Mac desktop, and the latest rich-output/scrolling changes still need Mac verification.
 
 The plugin uses Raycast UI/storage APIs, standard Node.js cryptography, and HTTP/SSE/WebSocket connections. Its custom shortcuts include macOS mappings. No Windows executable or PowerShell command is required by the plugin itself. The bundled `install.ps1`, `run.ps1`, and installer tests are Windows-only; do not use them on a Mac.
 
@@ -99,7 +99,9 @@ Assign aliases/hotkeys in **Raycast Settings > Extensions > Pocket AI**. These s
 | AI Translator  | `tr`  | Command+Option+3     |
 | AI Polish Text | `pl`  | Command+Option+4     |
 
-For example: type `df`, press Space, type `hello`, and press Return. Replies stream below the top bar; type follow-up instructions into the same bar.
+For example: type `df`, press Space, type `hello`, and press Return. Replies stream into the native Markdown preview; type follow-up instructions into the same top bar. Markdown images work through reachable URLs, not binary attachments or an arbitrary web canvas.
+
+Use **Actions > Use Full-Width Text** for row-by-row automatic following, or **Show Rich Markdown** to return to formatted replies. The default is configurable under **Response View** in native preferences. Rich mode follows new messages, but Raycast V1 owns scrolling inside its Markdown pane and exposes no force-scroll API for that pane. Long rich replies can be scrolled manually.
 
 Inside a direct-model conversation, **Command+L** pauses/resumes following, **Command+Shift+,** opens Pocket AI Settings, and **Command+Shift+V** uses clipboard text. Remote conversations also provide Command+L; use their Actions menu for settings and controls.
 
@@ -113,7 +115,7 @@ Before calling installation successful:
 2. Verify model/agent discovery shows a dropdown, not a manual model-ID requirement.
 3. Send a harmless question and observe partial output arriving before completion.
 4. Send a follow-up that refers to the previous answer and confirm context is retained.
-5. Test Command+L on an overflowing answer, plus your chosen alias/hotkey.
+5. Test Command+L and automatic following on an overflowing **Full-Width Text** answer, plus your chosen alias/hotkey. Verify Markdown and image URLs in **Rich Markdown**; do not confuse native preview scrolling with transcript following.
 6. If using Translator, set a target language and test it. If using a remote backend, check that selecting it hides the other backend's fields.
 
 Builds and mock tests cannot establish these desktop/provider checks. If you cannot complete them, report the exact missing prerequisite or observed failure. Do not claim that Windows verification covered this Mac.

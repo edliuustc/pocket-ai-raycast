@@ -85,7 +85,9 @@ The device private key and issued device tokens are AES-256-GCM encrypted before
 
 ## Conversations, progress, and controls
 
-- Queries and follow-ups use the top bar. Output streams underneath, with bounded recent tool activity and the existing follow-latest/pause policy.
+- Queries and follow-ups use the top bar. Rich Markdown replies render directly in the native preview; Actions can switch to full-width streaming text. Markdown image URLs are preserved; binary attachments are not implemented.
+- Routine connecting and successfully completed rows are hidden; the loading bar indicates active work. Failure, uncertainty, stopping/stopped states, tool activity, and approvals remain visible.
+- Shared selection following advances to new messages in rich mode or new rows in full-width text. Native Markdown-pane scrolling is controlled by Raycast, not an extension scroll API.
 - Select an approval row to review its details, then choose **Approve Once** or **Deny**. No blanket/always approval is offered. Deny-only requests do not show approval.
 - **Stop Remote Run** sends a server-side stop/abort. “Stopping” means the request was made, not that remote execution has finished; wait for its terminal state.
 - Closing Raycast's view disconnects the frontend; it does **not** cancel already accepted remote work.

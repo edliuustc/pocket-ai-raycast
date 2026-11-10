@@ -16,7 +16,8 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { useModels } from "../hooks/use-models";
 import { Preferences } from "../lib/preferences";
 import { responseRows } from "../lib/response-rows";
-import { FollowLatestPolicy, latestResponseItemId } from "../lib/scroll-policy";
+import { conversationPresentation } from "../lib/scroll-policy";
+import { useFollowLatest } from "../hooks/use-follow-latest";
 import { conversationMessages, needsLanguage, Turn } from "../lib/session";
 import { loadTools, restoreTool, saveTool } from "../lib/storage";
 import {
@@ -138,30 +139,22 @@ function QueryView({
   const [turns, setTurns] = useState<Turn[]>([]);
   const [request, setRequest] = useState<Request>();
   const [loading, setLoading] = useState(false);
-  const [selectedItem, setSelectedItem] = useState<string | null>(null);
-  const [following, setFollowing] = useState(true);
-  const scrollPolicy = useRef(new FollowLatestPolicy());
-  const lastScrollAt = useRef(0);
+  const [rich, setRich] = useState(preferences.responseView !== "plain");
   const controller = useRef<AbortController | undefined>(undefined);
   const nextId = useRef(0);
   const autoSubmitted = useRef(false);
   const language = tool.targetLanguage || "";
   const languageRequired = needsLanguage(tool) && !language;
-  const latestItem = latestResponseItemId(turns);
-  const moveToLatest = useCallback((id: string) => {
-    scrollPolicy.current.expectSelection(id);
-    lastScrollAt.current = Date.now();
-    setSelectedItem(id);
-  }, []);
-
-  useEffect(() => {
-    if (!following || !latestItem || selectedItem === latestItem) return;
-    const delay = loading
-      ? Math.max(0, 120 - (Date.now() - lastScrollAt.current))
-      : 0;
-    const timer = setTimeout(() => moveToLatest(latestItem), delay);
-    return () => clearTimeout(timer);
-  }, [following, latestItem, loading, selectedItem, moveToLatest]);
+  const presentation = useMemo(
+    () => conversationPresentation(turns, rich),
+    [turns, rich],
+  );
+  const follow = useFollowLatest(
+    presentation.latestId,
+    presentation.itemIds,
+    loading,
+  );
+  const { following } = follow;
   const providerResult = useMemo(() => {
     try {
       return {
@@ -231,9 +224,7 @@ function QueryView({
       ]);
       setQuery("");
       setLoading(true);
-      scrollPolicy.current.resume();
-      setFollowing(true);
-      moveToLatest(`turn-${id}-status`);
+      follow.resume();
       setRequest({
         id,
         messages,
@@ -250,7 +241,7 @@ function QueryView({
       tool,
       language,
       provider,
-      moveToLatest,
+      follow.resume,
     ],
   );
 
@@ -286,7 +277,6 @@ function QueryView({
     let active = true;
     let text = "";
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let first = true;
     void streamCompletion(
       request.provider,
       request.messages,
@@ -296,13 +286,6 @@ function QueryView({
           timer = setTimeout(() => {
             if (active) {
               updateTurn(request.id, { answer: text });
-              const rows = responseRows(text);
-              if (first && rows.length) {
-                if (scrollPolicy.current.following) {
-                  moveToLatest(`turn-${request.id}-answer-${rows.length - 1}`);
-                }
-                first = false;
-              }
             }
             timer = undefined;
           }, 40);
@@ -344,7 +327,7 @@ function QueryView({
       abort.abort();
       if (timer) clearTimeout(timer);
     };
-  }, [request, updateTurn, moveToLatest]);
+  }, [request, updateTurn]);
 
   function stop() {
     controller.current?.abort();
@@ -405,18 +388,17 @@ function QueryView({
             Windows: { modifiers: ["ctrl"], key: "l" },
             macOS: { modifiers: ["cmd"], key: "l" },
           }}
-          onAction={() => {
-            if (following) {
-              scrollPolicy.current.pause();
-              setFollowing(false);
-            } else {
-              scrollPolicy.current.resume();
-              setFollowing(true);
-              if (latestItem) moveToLatest(latestItem);
-            }
-          }}
+          onAction={follow.toggle}
         />
       )}
+      <Action
+        title={rich ? "Use Full-Width Text" : "Show Rich Markdown"}
+        icon={Icon.Document}
+        onAction={() => {
+          setRich((value) => !value);
+          follow.resume();
+        }}
+      />
       <Action
         title="Customize This Tool"
         icon={Icon.Gear}
@@ -494,9 +476,7 @@ function QueryView({
           setRequest(undefined);
           setTurns([]);
           setQuery("");
-          setSelectedItem(null);
-          scrollPolicy.current = new FollowLatestPolicy();
-          setFollowing(true);
+          follow.reset();
         }}
       />
       <Action.CreateQuicklink
@@ -532,13 +512,9 @@ function QueryView({
       onSearchTextChange={setQuery}
       searchBarPlaceholder={toolPlaceholder(tool, turns.length > 0, language)}
       filtering={false}
-      selectedItemId={selectedItem || undefined}
-      onSelectionChange={(id) => {
-        if (!id) return;
-        const keepFollowing = scrollPolicy.current.select(id, latestItem);
-        setSelectedItem(id);
-        setFollowing(keepFollowing);
-      }}
+      selectedItemId={follow.selectedItemId}
+      onSelectionChange={follow.onSelectionChange}
+      isShowingDetail={rich && turns.length > 0}
       isLoading={loading || selection.loading}
       actions={actions}
       searchBarAccessory={
@@ -589,27 +565,38 @@ function QueryView({
           actions={actions}
         />
       )}
-      {turns.map((turn) => [
+      {presentation.entries.map(({ turn, queryRows, answerRows }) => [
         <List.Section key={`you-${turn.id}`} title="You">
-          {responseRows(turn.query).map((row, index) => (
+          {queryRows.map((row) => (
             <List.Item
-              key={`query-${index}`}
-              id={`turn-${turn.id}-query-${index}`}
-              title={row}
+              key={row.id}
+              id={row.id}
+              title={rich ? responseRows(row.text)[0] || "Question" : row.text}
+              detail={
+                rich ? <List.Item.Detail markdown={row.text} /> : undefined
+              }
               actions={actions}
             />
           ))}
         </List.Section>,
         <List.Section key={`ai-${turn.id}`} title={`Pocket AI / ${turn.model}`}>
-          {responseRows(turn.answer).map((row, index) => (
+          {answerRows.map((row) => (
             <List.Item
-              key={`answer-${index}`}
-              id={`turn-${turn.id}-answer-${index}`}
-              title={row}
+              key={row.id}
+              id={row.id}
+              title={rich ? "Response" : row.text}
+              detail={
+                rich ? (
+                  <List.Item.Detail
+                    markdown={row.text}
+                    isLoading={turn.status === "streaming"}
+                  />
+                ) : undefined
+              }
               actions={actions}
             />
           ))}
-          {turn.status === "streaming" && !responseRows(turn.answer).length && (
+          {turn.status === "streaming" && !answerRows.length && (
             <List.Item
               id={`turn-${turn.id}-status`}
               title="Waiting for the first token..."
@@ -622,6 +609,13 @@ function QueryView({
               id={`turn-${turn.id}-error`}
               title="Request Failed"
               subtitle={turn.error}
+              detail={
+                rich ? (
+                  <List.Item.Detail
+                    markdown={turn.error || "Request failed."}
+                  />
+                ) : undefined
+              }
               icon={Icon.Warning}
               actions={actions}
             />
@@ -630,6 +624,9 @@ function QueryView({
             <List.Item
               id={`turn-${turn.id}-stopped`}
               title="Generation Stopped"
+              detail={
+                rich ? <List.Item.Detail markdown={turn.answer} /> : undefined
+              }
               icon={Icon.Stop}
               actions={actions}
             />
